@@ -23,18 +23,18 @@ def is_dna_rna(seq_list):
 
 
 def complement(seq_list, seq_type):
-    complement_seq_list = []
+    complement_seqs = []
     for seq in seq_list:
-        comp_seq = str()
+        compl_seq = str()
         for nucleotide in seq:
             if seq_type == 'DNA':
-                comp_seq += DNA_COMPLEMENTARY_MAP[nucleotide]
+                compl_seq += DNA_COMPLEMENTARY_MAP[nucleotide]
             elif seq_type == 'RNA':
-                comp_seq += RNA_COMPLEMENTARY_MAP[nucleotide]
+                compl_seq += RNA_COMPLEMENTARY_MAP[nucleotide]
             else:
                 raise ValueError(f'{seq_type} sequence type is not available. Please, use DNA or RNA')
-        complement_seq_list.append(comp_seq)
-    return complement_seq_list[0] if len(seq_list) == 1 else complement_seq_list
+        complement_seqs.append(compl_seq)
+    return complement_seqs[0] if len(seq_list) == 1 else complement_seqs
 
 
 def reverse_complement(seq_list, seq_type):
@@ -42,7 +42,7 @@ def reverse_complement(seq_list, seq_type):
     if isinstance(complement_seqs, str):
         return complement_seqs[::-1]
     else:
-        return reverse(complement_seq_list)
+        return reverse(complement_seqs)
 
 
 def transcribe(seq_list):
@@ -97,4 +97,3 @@ def run_dna_rna_tools(*args, seq_type='DNA'):
         return gc_content(seq_list)
     else:
         raise ValueError(f'There is no {tool} tool available!')
-
