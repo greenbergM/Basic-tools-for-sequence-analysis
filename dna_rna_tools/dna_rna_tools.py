@@ -5,7 +5,7 @@ RNA_COMPLEMENTARY_MAP = {'A': 'U', 'a': 'u', 'G': 'C', 'g': 'c', 'U': 'A', 'u': 
                          't': 'a'}
 
 
-def is_dna_rna(seqs):
+def nucl_acid_identity(seqs):
     dna_rna_identity = dict()
     for seq in seqs:
         nucleotides = set(seq.upper())
@@ -80,8 +80,9 @@ def gc_content(seqs):
 def run_dna_rna_tools(*args, seq_type='DNA'):
     seqs = args[:-1]
     tool = args[-1]
-    if tool == 'is_dna_rna':
-        return is_dna_rna(seqs)
+    sequence_identity = nucl_acid_identity(seqs)
+    if tool == 'nucl_acid_identity':
+        return sequence_identity
     elif tool == 'complement':
         return complement(seqs, seq_type)
     elif tool == 'reverse_complement':
@@ -94,3 +95,4 @@ def run_dna_rna_tools(*args, seq_type='DNA'):
         return gc_content(seqs)
     else:
         raise ValueError(f'There is no {tool} tool available!')
+
