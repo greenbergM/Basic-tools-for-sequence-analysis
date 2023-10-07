@@ -136,24 +136,6 @@ def get_seq_characteristic(seq: str) -> dict:
     return res_count
 
 
-def find_res(seq: str, res_of_interest: str) -> str:
-    """
-    Find all positions of certain residue in your seq
-    :param seq: protein seq in 1-letter encoding (str)
-    :param res_of_interest: specify the residue of interest (str)
-    :return: positions of specified residue in your seq (str)
-    """
-    res_of_interest = res_of_interest.upper()
-    seq = seq.upper()
-    if len(res_of_interest) == 3:
-        res_of_interest = RESIDUES_NAMES[res_of_interest]
-    res_of_interest_position = []
-    for ind, res in enumerate(seq, 1):
-        if res == res_of_interest:
-            res_of_interest_position.append(ind)
-    return f'{res_of_interest} positions: {res_of_interest_position}'
-
-
 def find_site(seq: str, site: str) -> str:
     """
     Find if seq contains certain site and get positions of its site
@@ -233,38 +215,6 @@ def calculate_isoelectric_point(seq: str) -> float:
             pka_amount += 1
     pi = sum_pka / pka_amount
     return pi
-
-
-def analyze_secondary_structure(seq: str) -> list[str]:
-    """
-    Calculate the percentage of amino acids found in the three main
-    types of protein secondary structure: beta-turn, beta-sheet and alpha-helix
-    :param seq: protein seq in 1-letter encoding (str)
-    :return: percentage of amino acids belonging to three types of secondary structure (list[str])
-    """
-    b_turn_set = {'G', 'P', 'N', 'D'}
-    b_sheet_set = {'F', 'Y', 'I', 'V', 'C', 'W'}
-    alpha_helix_set = {'M', 'A', 'L', 'E', 'K'}
-    result = []
-    res_for_seq = []
-    count = 0
-    protein_length = len(seq)
-    for aa in b_turn_set:
-        count += seq.upper().count(aa)
-    b_turn_exp = str(count / protein_length * 100)
-    res_for_seq += ['b-turn amino acids in protein' + ' is ' + b_turn_exp + '%']
-    count = 0
-    for aa in b_sheet_set:
-        count += seq.upper().count(aa)
-    b_sheet_exp = str(count / protein_length * 100)
-    res_for_seq += ['b-sheet amino acids in protein' + ' is ' + b_sheet_exp + '%']
-    count = 0
-    for aa in alpha_helix_set:
-        count += seq.upper().count(aa)
-    alpha_helix_exp = str(count / protein_length * 100)
-    res_for_seq += ['alpha_helix amino acids in protein' + ' is ' + alpha_helix_exp + '%']
-    result += res_for_seq
-    return result
 
 
 def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], str, list[float], float]:
