@@ -104,4 +104,3 @@ def run_filter_fastaq(seqs: dict[str:str], gc_bounds=(0, 100), length_bounds=(0,
         if fasq.judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
     return filtered_seqs
-
