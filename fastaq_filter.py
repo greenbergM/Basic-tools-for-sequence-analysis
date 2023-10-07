@@ -1,7 +1,7 @@
 from typing import List, Union
 
 
-def filter_gc(seq: str, gc_bounds: tuple) -> bool:
+def gc_test(seq: str, gc_bounds: tuple) -> bool:
     """
     Check sequence for GC-content.
     :param seq: given DNA sequence for analysis (str)
@@ -15,7 +15,7 @@ def filter_gc(seq: str, gc_bounds: tuple) -> bool:
         return True
 
 
-def filter_length(seq: str, length_bounds: tuple) -> bool:
+def length_test(seq: str, length_bounds: tuple) -> bool:
     """
     Check sequence for length.
     :param seq: given DNA sequence for analysis (str)
@@ -28,7 +28,7 @@ def filter_length(seq: str, length_bounds: tuple) -> bool:
         return True
 
 
-def filter_quality(seq_quality: str, quality_threshold: int) -> bool:
+def quality_test(seq_quality: str, quality_threshold: int) -> bool:
     """
     Check sequence for quality.
     :param seq_quality: string of quality (ASCII coding) for each nucleotide in given DNA sequence (str)
@@ -70,9 +70,9 @@ def run_filter_fastaq(seqs: dict[str:str], gc_bounds=(0, 100), length_bounds=(0,
         length_bounds = (0, length_bounds)
     filtered_seqs = dict()
     for seq_name in seqs.keys():
-        gc_result = filter_gc(seqs[seq_name][0], gc_bounds)
-        length_result = filter_length(seqs[seq_name][0], length_bounds)
-        quality_result = filter_quality(seqs[seq_name][1], quality_threshold)
+        gc_result = gc_test(seqs[seq_name][0], gc_bounds)
+        length_result = length_test(seqs[seq_name][0], length_bounds)
+        quality_result = quality_test(seqs[seq_name][1], quality_threshold)
         if judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
     return filtered_seqs
