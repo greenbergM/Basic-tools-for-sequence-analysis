@@ -68,84 +68,57 @@ AMINO_ACID_TO_MRNA = {'A': 'GCN',
                       'V': 'GUN'}
 
 
-def change_residues_encoding(seq: str, query: str = 'one') -> str:
+def make_three_letter(seq: str):
     """
-    Transfer amino acids from 3-letter to 1-letter code and vice versa. By default, converts all seq into 1-letter
-    format, even those already 1-letter. Case-sensitive.
-    :param seq: protein seq (str)
-    :param query: specify target encoding (str)
-    :return: same protein seq in another encoding (str)
+    Get amino acid list from protein in 3-letter encoding
+    :param seq: protein seq in 3-letter encoding (str)
+    :return: list of amino acids (list)
     """
-    result = str()
-    res_seq = str()
-    registr = []
-    if ' ' in seq:
-        seq_new = seq.split(' ')
-        res_length = len(seq_new[0])
-        for el in seq_new:
-            if el.isupper():
-                registr.append('Upper')
-            else:
-                registr.append('Lower')
-        for el in seq_new:
-            if (len(el) != res_length):
-                raise TypeError('Wrong sequence format')
-            elif (res_length == 1):
-                res_seq += el
-            elif (res_length == 3):
-                res_seq += (RESIDUES_NAMES.get(el.upper()))
-            else:
-                raise TypeError(f'Wrong sequence format')
-    else:
-        for el in seq:
-            if el.isupper():
-                registr.append('Upper')
-            else:
-                registr.append('Lower')
-        res_seq += seq
-
-    if query == 'one':
-        res_with_reg = str()
-        for res, reg in zip(res_seq, registr):
-            if (reg == 'Upper'):
-                res_with_reg += res.upper()
-            elif (reg == 'Lower'):
-                res_with_reg += res.lower()
-        result += res_with_reg
-    if query == 'three':
-        trans_res_seq = str()
-        for i in range(len(res_seq)):
-            if i != len(res_seq) - 1:
-                for three, one in RESIDUES_NAMES.items():
-                    if one == (res_seq[i].upper()):
-                        trans_res_seq += three + ' '
-                        break
-            else:
-                for three, one in RESIDUES_NAMES.items():
-                    if one == res_seq[i].upper():
-                        trans_res_seq += three
-                        break
-            res_with_reg = str()
-            temp_trans = [trans_res_seq[i:i + 4] for i in range(0, len(trans_res_seq), 4)]
-            for res, reg in zip(temp_trans, registr):
-                if (reg == 'Upper'):
-                    res_with_reg += res.upper()
-                if (reg == 'Lower'):
-                    res_with_reg += res.lower()
-        result += res_with_reg
-    return result
+    seq = seq.replace(" ", "")
+    three_letter_seq_list = [seq[counter:counter + 3].upper() for counter in range(0, len(seq), 3)]
+    return three_letter_seq_list
 
 
-def is_protein(seq: str) -> bool:
+def is_protein(seq: str, curr_encoding: int) -> bool:
     """
     Check if sequence is protein or not by identify invalid seq elements, which are not presented in dicts above.
-    :param seq: protein seq in 1-letter encoding (str)
+    :param seq: protein seq in 3-letter or 1-letter encoding (str)
+    :param curr_encoding: protein encoding that is used in input (int)
     :return: if seq is correct protein seq or not (bool)
     """
-    for res in seq.upper():
-        if res not in RESIDUES_NAMES.values():
+    if curr_encoding == 1:
+        if set(seq.upper()).difference((RESIDUES_NAMES.values())):
             return False
-    return True
+        else:
+            return True
+    elif curr_encoding == 3:
+        amino_acids = make_three_letter(seq)
+        if set(amino_acids).difference((RESIDUES_NAMES.keys())):
+            return False
+        else:
+            return True
+    else:
+        raise ValueError(f'{curr_encoding}-letter amino acid encoding is not available! Use 1 or 3.')
+
+
+def change_encoding(seqs: tuple[str], curr_encoding: int) -> list[str]:
+    """
+    Get protein sequence in 1-letter encoding
+    :param seqs: protein seq in 3-letter or 1-letter encoding (str)
+    :param curr_encoding: protein encoding that is used in input (int)
+    :return: protein sequence in 1-letter encoding (str)
+    """
+    renamed_seqs = []
+    for seq in seqs:
+        renamed_seq = str()
+        if curr_encoding == 3:
+            amino_acids = make_three_letter(seq)
+            for amino_acid in amino_acids:
+                renamed_seq += RESIDUES_NAMES[amino_acid]
+            renamed_seqs.append(renamed_seq)
+        else:
+            renamed_seqs.append(seq.upper())
+    return renamed_seqs
 
 
 def get_seq_characteristic(seq: str) -> dict:
@@ -264,10 +237,10 @@ def calculate_isoelectric_point(seq: str) -> float:
 
 def analyze_secondary_structure(seq: str) -> list[str]:
     """
-    Calculate the percentage of amino acids found in the three main 
+    Calculate the percentage of amino acids found in the three main
     types of protein secondary structure: beta-turn, beta-sheet and alpha-helix
     :param seq: protein seq in 1-letter encoding (str)
-    :return: percentage of amino acids belonging to three types of secondary structure (list[str])    
+    :return: percentage of amino acids belonging to three types of secondary structure (list[str])
     """
     b_turn_set = {'G', 'P', 'N', 'D'}
     b_sheet_set = {'F', 'Y', 'I', 'V', 'C', 'W'}
@@ -294,7 +267,7 @@ def analyze_secondary_structure(seq: str) -> list[str]:
     return result
 
 
-def run_protein_analysis(*args: str, ) -> Union[List[str], str]:
+def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], str, list[float], float]:
     """
     Launch desired operation with proteins sequences. Pass comma-separated sequences,
     additional argument (if certain function requires it) and specify function name you want to apply to all sequences.
@@ -302,37 +275,40 @@ def run_protein_analysis(*args: str, ) -> Union[List[str], str]:
 
     :param args:
     - seq (str): amino acids sequences for analysis in 1-letter or 3-letter code (as many as you wish)
-    - additional arg (str): necessary parameter for certain functions (for example, specify target protein site)
+    - curr_encoding (int): type of encoding of given protein sequences
     - operation name (str): specify procedure you want to apply
-
+    :param site_of_interest: one letter encoding of desired site (for find_site function)
     :return: the result of procedure in list or str format
     """
-    # first value is function name, second is real function, third is number of function arguments
-    function_names = {'change_residues_encoding': [change_residues_encoding, 2],
-                      'is_protein': [is_protein, 1],
-                      'get_seq_characteristic': [get_seq_characteristic, 1],
-                      'find_res': [find_res, 2],
-                      'find_site': [find_site, 2],
-                      'calculate_protein_mass': [calculate_protein_mass, 1],
-                      'calculate_average_hydrophobicity': [calculate_average_hydrophobicity, 1],
-                      'get_mrna': [get_mrna, 1],
-                      'calculate_isoelectric_point': [calculate_isoelectric_point, 1],
-                      'analyze_secondary_structure': [analyze_secondary_structure, 1]}
-
-    procedure = args[-1]
-
+    tool = args[-1]
+    curr_encoding = args[-2]
+    seqs = args[:-2]
     processed_result = []
-
-    seqs = [change_residues_encoding(seq) for seq in args[:-1 * (function_names[procedure][1])]]
-    for idx, seq in enumerate(seqs):
-        if not is_protein(seq):
-            processed_result.append(f'Sequence number {idx + 1} is not available for operations! Skip it.')
-            continue
-        if function_names[procedure][1] == 1:
-            processed_result.append(function_names[procedure][0](seq))
-        elif function_names[procedure][1] == 2:
-            add_arg = args[-2]
-            processed_result.append(function_names[procedure][0](seq, add_arg))
-    if len(processed_result) == 1:
-        return processed_result[0]
-    return processed_result
+    for seq in seqs:
+        if not is_protein(seq, curr_encoding):
+            raise ValueError('Please, use protein sequences!')
+    seqs = change_encoding(seqs, curr_encoding)
+    if tool == 'get_seq_characteristic':
+        for seq in seqs:
+            processed_result.append(get_seq_characteristic(seq))
+    elif tool == 'find_site':
+        for seq in seqs:
+            processed_result.append(find_site(seq, site_of_interest))
+    elif tool == 'calculate_protein_mass':
+        for seq in seqs:
+            processed_result.append(calculate_protein_mass(seq))
+    elif tool == 'calculate_average_hydrophobicity':
+        for seq in seqs:
+            processed_result.append(calculate_average_hydrophobicity(seq))
+    elif tool == 'calculate_isoelectric_point':
+        for seq in seqs:
+            processed_result.append(calculate_isoelectric_point(seq))
+    elif tool == 'get_seq_characteristics':
+        for seq in seqs:
+            processed_result.append(get_seq_characteristic(seq))
+    elif tool == 'get_mrna':
+        for seq in seqs:
+            processed_result.append(get_mrna(seq))
+    else:
+        raise ValueError(f'{tool} operation is not available!')
+    return processed_result[0] if len(processed_result) == 1 else processed_result
