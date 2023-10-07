@@ -1,8 +1,13 @@
 from typing import List, Union
 
+# Set of possible nucleotides
 NUCLEOTIDE_SET = {'A', 'T', 'G', 'C', 'U'}
+
+# Complementary pairs for DNA nucleotides
 DNA_COMPLEMENTARY_MAP = {'A': 'T', 'a': 't', 'G': 'C', 'g': 'c', 'T': 'A', 't': 'a', 'C': 'G', 'c': 'g', 'U': 'A',
                          'u': 'a'}
+
+# Complementary pairs for RNA nucleotides
 RNA_COMPLEMENTARY_MAP = {'A': 'U', 'a': 'u', 'G': 'C', 'g': 'c', 'U': 'A', 'u': 'a', 'C': 'G', 'c': 'g', 'T': 'A',
                          't': 'a'}
 
@@ -32,10 +37,11 @@ def nucl_acid_identity(seqs: tuple[str]) -> dict:
 
 def complement(seqs: tuple[str], seq_type: str) -> Union[list[str], str]:
     """
-    Get complement DNA or RNA sequence
+    Get complement DNA or RNA sequence.
     :param seqs: sequences of nucleic acids (tuple[str])
     :param seq_type: type of desired complement sequence (str)
-    :return: list of complement sequences ([list[str]); if given one sequence it will be returned in string (str)
+    :return: list of complement sequences ([list[str]);
+    if given one sequence it will be returned in string (str)
     """
     complement_seqs = []
     for seq in seqs:
@@ -53,10 +59,11 @@ def complement(seqs: tuple[str], seq_type: str) -> Union[list[str], str]:
 
 def reverse_complement(seqs: tuple[str], seq_type: str) -> Union[list[str], str]:
     """
-    Get reversed complement DNA or RNA sequence
+    Get reversed complement DNA or RNA sequence.
     :param seqs: sequences of nucleic acids (tuple[str])
     :param seq_type: type of desired complement sequence (str)
-    :return: list of reversed complement sequences ([list[str]); if given one sequence it will be returned in string (str)
+    :return: list of reversed complement sequences ([list[str]);
+    if given one sequence it will be returned in string (str)
     """
     complement_seqs = complement(seqs, seq_type)
     if isinstance(complement_seqs, str):
@@ -67,10 +74,11 @@ def reverse_complement(seqs: tuple[str], seq_type: str) -> Union[list[str], str]
 
 def transcribe(seqs: tuple[str], seqs_identity: dict) -> Union[list[str], str]:
     """
-    Get transcribed sequences of DNA and reversed transcribed sequences of RNA
+    Get transcribed sequences of DNA and reversed transcribed sequences of RNA.
     :param seqs: sequences of nucleic acids (tuple[str])
-    :param seqs_identity:
-    :return: list of complement sequences ([list[str]); if given one sequence it will be returned in string (str)
+    :param seqs_identity: dictionary, where the sequence is key and nucleic acid type is its value (dict)
+    :return: list of complement sequences ([list[str]);
+    if given one sequence it will be returned in string (str)
     """
     transcribed_seq_list = []
     for seq in seqs:
@@ -83,7 +91,13 @@ def transcribe(seqs: tuple[str], seqs_identity: dict) -> Union[list[str], str]:
     return transcribed_seq_list[0] if len(seqs) == 1 else transcribed_seq_list
 
 
-def reverse(seqs: tuple[str]) -> Union[list[str], str]:
+def reverse(seqs: Union[tuple[str], list[str]]) -> Union[list[str], str]:
+    """
+    Get reversed sequences.
+    :param seqs: sequences of nucleic acids (tuple[str])
+    :return: list of reversed sequences ([list[str]);
+    if given one sequence it will be returned in string (str)
+    """
     reversed_seq_list = []
     for seq in seqs:
         reversed_seq = seq[::-1]
@@ -92,6 +106,12 @@ def reverse(seqs: tuple[str]) -> Union[list[str], str]:
 
 
 def gc_content(seqs: tuple[str]) -> Union[list[float], float]:
+    """
+    Get GC-content percent for given sequences.
+    :param seqs: sequences of nucleic acids (tuple[str])
+    :return: list of GC-content for each sequence ([list[float]);
+    if given one sequence it will be returned in float (float)
+    """
     gc_content_list = []
     for seq in seqs:
         gc_amount = seq.upper().count('G') + seq.upper().count('C')
@@ -103,6 +123,18 @@ def gc_content(seqs: tuple[str]) -> Union[list[float], float]:
 
 
 def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
+    """
+    Launch desired operation with nucleic acid sequences. Pass comma-separated sequences,
+    additional argument (if certain function requires it) and specify function name you want to apply to all sequences.
+    Pass arguments strictly in this order, otherwise it won't be parsed.
+
+    :param args:
+    - nucleic acid sequences for analysis (str)
+    - operation name (str): specify procedure you want to apply (str)
+    :param seq_type: type of desired complement sequence (for complement function) (str)
+
+    :return: the result of procedure in list or str format
+    """
     seqs = args[:-1]
     tool = args[-1]
     seqs_identity = nucl_acid_identity(seqs)
