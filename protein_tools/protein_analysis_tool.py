@@ -23,6 +23,29 @@ RESIDUES_NAMES = {'ALA': 'A',
                   'VAL': 'V'
                   }
 
+# 1-letter with corresponding 3-letter residues names
+RESIDUES_NAMES_REVERSED = {'A': 'ALA',
+                           'R': 'ARG',
+                           'N': 'ASN',
+                           'D': 'ASP',
+                           'C': 'CYS',
+                           'Q': 'GLN',
+                           'E': 'GLU',
+                           'G': 'GLY',
+                           'H': 'HIS',
+                           'I': 'ILE',
+                           'L': 'LEU',
+                           'K': 'LYS',
+                           'M': 'MET',
+                           'F': 'PHE',
+                           'P': 'PRO',
+                           'S': 'SER',
+                           'T': 'THR',
+                           'W': 'TRP',
+                           'Y': 'TYR',
+                           'V': 'VAL'
+                           }
+
 # first value is hydrophobicity index, second is pKa (pKa1, pKa2, pKa3 respectively), third is molecular mass in Da
 RESIDUES_CHARACTERISTICS = {'A': [1.8, [2.34, 9.69, 0], 89],
                             'R': [-4.5, [2.17, 9.04, 12.48], 174],
@@ -123,35 +146,32 @@ def change_encoding(seqs: tuple[str], curr_encoding: int) -> list[str]:
 
 def get_seq_characteristic(seq: str) -> dict:
     """
-    Count entry of each residue type in your seq. Get description of amino acid composition.
+    Count entry of each residue type in your seq. Get description of amino acid composition in dict format.
     :param seq: protein seq in 1-letter encoding (str)
     :return: each residue type in seq in 3-letter code and its amount in current seq (dict)
     """
-    seq = seq.upper()
-    res_count = {}
-    for res in seq:
-        res_count[[tl_code for tl_code in RESIDUES_NAMES if RESIDUES_NAMES[tl_code] == res][0]] = 0
-    for res in seq:
-        res_count[[tl_code for tl_code in RESIDUES_NAMES if RESIDUES_NAMES[tl_code] == res][0]] += 1
-    return res_count
+    residue_count = {}
+    for residue in set(seq):
+        residue_entry = seq.count(residue)
+        residue_count[RESIDUES_NAMES_REVERSED[residue]] = residue_entry
+    return residue_count
 
 
 def find_site(seq: str, site: str) -> str:
     """
-    Find if seq contains certain site and get positions of its site
+    Find if seq contains certain site and get positions of this site
     :param seq: protein seq in 1-letter encoding (str)
     :param site: specify site of interest (str)
     :return: positions of residues for each certain site in seq (str)
     """
-    site = change_residues_encoding(site).upper()
-    seq = seq.upper()
-    if not is_protein(site):
+    site = site.upper()
+    if set(site).difference(RESIDUES_NAMES.values()):
         return f'Site {site} is not a protein!'
     if site in seq:
         site_full_position = []
         site_count = seq.count(site)
         site_start_position = [(coordinate + 1) for coordinate in range(len(seq)) if seq.startswith(site, coordinate)]
-        site_end_position = [(coordinate + len(site)) for coordinate in site_start_position]
+        site_end_position = [(coordinate + len(site) - 1) for coordinate in site_start_position]
         for counter in range(len(site_start_position)):
             site_full_position.append(f'{site_start_position[counter]}:{site_end_position[counter]}')
         return f'Site entry in sequence = {site_count}. Site residues can be found at positions: {site_full_position}'
@@ -166,7 +186,7 @@ def calculate_protein_mass(seq: str) -> float:
     :return: mass in Da (float)
     """
     total_mass = 0
-    for res in seq.upper():
+    for res in seq:
         total_mass += RESIDUES_CHARACTERISTICS[res][2]
     return total_mass
 
@@ -178,9 +198,9 @@ def calculate_average_hydrophobicity(seq: str) -> float:
     :return: average hydrophobicity (float)
     """
     sum_hydrophobicity_ind = 0
-    for res in seq.upper():
+    for res in seq:
         sum_hydrophobicity_ind += RESIDUES_CHARACTERISTICS[res][0]
-    return sum_hydrophobicity_ind / len(seq)
+    return round(sum_hydrophobicity_ind / len(seq), 2)
 
 
 def get_mrna(seq: str) -> str:
@@ -190,7 +210,7 @@ def get_mrna(seq: str) -> str:
     :return: potential encoding mRNA sequence with multiple choice for some positions (str)
     """
     mrna_seq = str()
-    for res in seq.upper():
+    for res in seq:
         mrna_seq += AMINO_ACID_TO_MRNA[res]
     return mrna_seq
 
@@ -203,7 +223,7 @@ def calculate_isoelectric_point(seq: str) -> float:
     """
     sum_pka = 0
     pka_amount = 0
-    for ind, res in enumerate(seq.upper(), 1):
+    for ind, res in enumerate(seq, 1):
         if ind == 1:
             sum_pka += RESIDUES_CHARACTERISTICS[res][1][1]
             pka_amount += 1
@@ -214,7 +234,7 @@ def calculate_isoelectric_point(seq: str) -> float:
             sum_pka += RESIDUES_CHARACTERISTICS[res][1][0]
             pka_amount += 1
     pi = sum_pka / pka_amount
-    return pi
+    return round(pi, 2)
 
 
 def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], str, list[float], float]:
