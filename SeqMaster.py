@@ -3,6 +3,7 @@ import scripts.dna_rna_tools as nucl
 import scripts.protein_tools as prot
 import scripts.fastaq_filter as fasq
 
+
 def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
     """
     Launch desired operation with nucleic acid sequences. Pass comma-separated sequences,
@@ -103,6 +104,4 @@ def run_filter_fastaq(seqs: dict[str:str], gc_bounds=(0, 100), length_bounds=(0,
         if fasq.judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
     return filtered_seqs
-
-
 
