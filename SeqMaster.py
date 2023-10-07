@@ -72,9 +72,6 @@ def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], 
     elif tool == 'calculate_isoelectric_point':
         for seq in seqs:
             processed_result.append(prot.calculate_isoelectric_point(seq))
-    elif tool == 'get_seq_characteristics':
-        for seq in seqs:
-            processed_result.append(prot.get_seq_characteristic(seq))
     elif tool == 'get_mrna':
         for seq in seqs:
             processed_result.append(prot.get_mrna(seq))
@@ -104,3 +101,4 @@ def run_filter_fastaq(seqs: dict[str:str], gc_bounds=(0, 100), length_bounds=(0,
         if fasq.judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
     return filtered_seqs
+
