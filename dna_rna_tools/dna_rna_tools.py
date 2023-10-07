@@ -5,9 +5,9 @@ RNA_COMPLEMENTARY_MAP = {'A': 'U', 'a': 'u', 'G': 'C', 'g': 'c', 'U': 'A', 'u': 
                          't': 'a'}
 
 
-def is_dna_rna(seq_list):
+def is_dna_rna(seqs):
     dna_rna_identity = dict()
-    for seq in seq_list:
+    for seq in seqs:
         nucleotides = set(seq.upper())
         if nucleotides.difference(NUCLEOTIDE_SET):
             raise ValueError("Incorrect input!")
@@ -22,9 +22,9 @@ def is_dna_rna(seq_list):
     return dna_rna_identity
 
 
-def complement(seq_list, seq_type):
+def complement(seqs, seq_type):
     complement_seqs = []
-    for seq in seq_list:
+    for seq in seqs:
         compl_seq = str()
         for nucleotide in seq:
             if seq_type == 'DNA':
@@ -34,21 +34,21 @@ def complement(seq_list, seq_type):
             else:
                 raise ValueError(f'{seq_type} sequence type is not available. Please, use DNA or RNA')
         complement_seqs.append(compl_seq)
-    return complement_seqs[0] if len(seq_list) == 1 else complement_seqs
+    return complement_seqs[0] if len(seqs) == 1 else complement_seqs
 
 
-def reverse_complement(seq_list, seq_type):
-    complement_seqs = complement(seq_list, seq_type)
+def reverse_complement(seqs, seq_type):
+    complement_seqs = complement(seqs, seq_type)
     if isinstance(complement_seqs, str):
         return complement_seqs[::-1]
     else:
         return reverse(complement_seqs)
 
 
-def transcribe(seq_list):
-    identity_dict = is_dna_rna(seq_list)
+def transcribe(seqs):
+    identity_dict = is_dna_rna(seqs)
     transcribed_seq_list = []
-    for seq in seq_list:
+    for seq in seqs:
         if identity_dict[seq] == 'DNA':
             transcribed_seq_list.append(seq.replace('T', 'U').replace('t', 'u'))
         elif identity_dict[seq] == 'RNA':
@@ -58,42 +58,39 @@ def transcribe(seq_list):
     return transcribed_seq_list[0] if len(seq_list) == 1 else transcribed_seq_list
 
 
-def reverse(seq_list):
+def reverse(seqs):
     reversed_seq_list = []
-    for seq in seq_list:
+    for seq in seqs:
         reversed_seq = seq[::-1]
         reversed_seq_list += [reversed_seq]
     return reversed_seq_list[0] if len(seq_list) == 1 else reversed_seq_list
 
 
-def gc_content(seq_list):
+def gc_content(seqs):
     gc_content_list = []
-    for seq in seq_list:
+    for seq in seqs:
         gc_amount = seq.upper().count('G') + seq.upper().count('C')
         gc_content_list += [round(gc_amount / len(seq) * 100, 2)]
-    if len(seq_list) == 1:
+    if len(seqs) == 1:
         return gc_content_list[0]
     else:
         return gc_content_list
 
 
 def run_dna_rna_tools(*args, seq_type='DNA'):
-    seqs_n_tool_list = []
-    for arg in args:
-        seqs_n_tool_list.append(arg)
-    seq_list = seqs_n_tool_list[:-1]
-    tool = seqs_n_tool_list[-1]
+    seqs = args[:-1]
+    tool = args[-1]
     if tool == 'is_dna_rna':
-        return is_dna_rna(seq_list)
+        return is_dna_rna(seqs)
     elif tool == 'complement':
-        return complement(seq_list, seq_type)
+        return complement(seqs, seq_type)
     elif tool == 'reverse_complement':
-        return reverse_complement(seq_list, seq_type)
+        return reverse_complement(seqs, seq_type)
     elif tool == 'transcribe':
-        return transcribe(seq_list)
+        return transcribe(seqs)
     elif tool == 'reverse':
-        return reverse(seq_list)
+        return reverse(seqs)
     elif tool == 'gc_content':
-        return gc_content(seq_list)
+        return gc_content(seqs)
     else:
         raise ValueError(f'There is no {tool} tool available!')
