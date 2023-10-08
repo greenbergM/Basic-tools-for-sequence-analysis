@@ -51,28 +51,34 @@ Main function: `run_dna_rna_tools(*args, seq_type = 'DNA')`
 #### Operations
 
 - `nucl_acid_identity` - shows the type of given sequences; if sequence cannot be identified as `'DNA'` or `'RNA'` it will be given name `'uncertain'`
-	*Returns* 
+
+  *Returns* 
 	`result: dict` 
 
 - `reverse` - gives the reversed copy of a sequence
-	*Returns*
+
+  *Returns*
 	`result: Union[list[str], str]` 
 
 - `complement` - gives complement `DNA` or `RNA` sequence depending on the `seq_type` argument. 
-	*Returns*
+
+  *Returns*
 	`result: Union[list[str], str]` 
 
 - `reverse_complement` - gives reversed complement `DNA` or `RNA` sequence depending on the `seq_type` argument. 
-	*Returns*
+
+  *Returns*
 	`result: Union[list[str], str]` 
 
 - `transcribe` - transcribes given sequences; DNA sequences are transcribed to RNA, RNA sequences are reversed transcribed to DNA.
-	*Returns*
+
+  *Returns*
 	`result: Union[list[str], str]` 
 
 
 - `gc_content` - gives the GC-content in percent for given sequences
-	*Returns*
+
+  *Returns*
 	`result: Union[list[float], float]`
 
 **Example**
@@ -112,27 +118,33 @@ Main function: `run_protein_analysis(*args, site_of_interest = None)`
  #### Operations
 
 - `get_seq_characteristic` - counts entry of each residue type in given sequences.
- 	*Returns*
+
+  *Returns*
 	`result: Union[list[dict], dict]` 
 
 - `find_site` - find if sequence contains certain site (given by `site_of_interest` argument) and get positions of this site
-	*Returns*
+
+  *Returns*
 	`result: Union[list[str], str]` 
 
 - `calculate_protein_mass` - calculates mass of residues in given sequences in Da
-	*Returns*
+
+  *Returns*
 	`result: Union[list[float], float]` 
 
 - `calculate_average_hydrophobicity` - calculates hydrophobicity index for each given sequence as sum of index for each residue in sequence divided by its length
-	*Returns*
+
+  *Returns*
 	`result: Union[list[float], float]` 
 
 - `calculate_isoelectric_point` - calculates soelectrinc point for each given sequence as sum of known pI for residues in sequence
-	*Returns*
+
+  *Returns*
 	`result: Union[list[float], float]` 
 
 - `get_mrna` - gives encoding mRNA nucleotides in degenerate form for each given sequence
-	*Returns*
+
+  *Returns*
 	`result: Union[list[str], str]` 
 
 **Example**
@@ -175,7 +187,8 @@ Main function: `run_filter_fastaq(seqs, gc_bounds=(0, 100), length_bounds=(0, 2 
 #### Operations
 
 Function filters sequences based on given arguments. Sequences will stay in output only if they fit all the given criteria. 
-	*Returns*
+	
+ *Returns*
 	`result: dict` 
 
 
