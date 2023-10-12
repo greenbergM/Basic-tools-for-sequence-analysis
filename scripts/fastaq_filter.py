@@ -53,3 +53,35 @@ def judge_seq(gc_result: bool, length_result: bool, quality_result: bool) -> boo
     :return: True if sequence fits all criteria (bool)
     """
     return gc_result and length_result and quality_result
+
+
+def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
+    """
+    Converts fastaq file into dict where key is sequence name, and seqs, quality are value
+    :param fastaq_file_path: path to the fastaq file (str)
+    :return: dict where key is sequence name, and seqs, quality are value (dict[str:tuple[str, str])
+    """
+    with open(fastaq_file_path, mode='r') as fastaq:
+        fastaq_dict = {}
+        counter = 1
+        commentary = []
+        for line in fastaq:
+            if counter == 1:
+                name = line.strip('\n')
+                counter += 1
+            elif counter == 2:
+                seq = line.strip('\n')
+                counter += 1
+            elif counter == 3:
+                #commentary.append(line.strip('\n'))
+                counter += 1
+            elif counter == 4:
+                quality = line.strip('\n')
+                fastaq_dict[name] = (seq, quality)
+                counter = 1
+    return fastaq_dict
+
+
+
+
+
