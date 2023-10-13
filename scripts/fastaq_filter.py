@@ -1,4 +1,5 @@
 from typing import List, Union
+import os
 
 
 def gc_test(seq: str, gc_bounds: tuple) -> bool:
@@ -38,7 +39,7 @@ def quality_test(seq_quality: str, quality_threshold: int) -> bool:
     q_score_list = []
     for nucleotide_quality in seq_quality:
         q_score_list.append(ord(nucleotide_quality) - 33)
-    if sum(q_score_list)/len(q_score_list) < quality_threshold:
+    if sum(q_score_list) / len(q_score_list) < quality_threshold:
         return False
     else:
         return True
@@ -81,7 +82,33 @@ def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
     return fastaq_dict
 
 
+def check_dir(directory):
+    """
+    Checks if directory exists; if not - makes it
+    :param directory: path to directory
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
+def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
+    """
+    Writes filtered sequences to new fastq file in fastaq_filtered_results directory
+    :param filtered_seqs: sequences that were filtered (dict)
+    :param output_filename: name for output fastq file (str)
+    :param input_path: path to the sequences in fastq format
+    :return:
+    """
+    if output_filename is None:
+        output_filename = os.path.basename(os.path.realpath(input_path))
+    if not output_filename.endswith('.fastq'):
+        output_filename = output_filename + '.fastq'
 
+    check_dir(os.path.join('SeqMaster', 'fastq_filtrator_resuls'))
 
+    with open(os.path.join('SeqMaster', 'fastq_filtrator_resuls', output_filename), mode='w') as fastq:
+        for seq in filtered_seqs.keys():
+            fastq.write(seq + '\n')
+            fastq.write(filtered_seqs[seq][0] + '\n')
+            fastq.write(filtered_seqs[seq][1] + '\n')
+            fastq.write(filtered_seqs[seq][2] + '\n')
