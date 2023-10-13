@@ -83,7 +83,7 @@ def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], 
 def run_filter_fastaq(input_path: str, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32), quality_threshold=0) -> dict[str: str]:
     """
     Filter DNA sequences based on the GC-content, length and sequencing quality (phred33).
-    :param input_path: path to the sequences in FASTAQ format
+    :param input_path: path to the sequences in fastq format
     :param gc_bounds: given threshold for GC-content (tuple/int)
     :param length_bounds: given threshold for length (tuple/int)
     :param quality_threshold: given threshold for quality (int)
