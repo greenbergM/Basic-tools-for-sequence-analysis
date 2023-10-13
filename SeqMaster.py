@@ -80,15 +80,16 @@ def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], 
     return processed_result[0] if len(processed_result) == 1 else processed_result
 
 
-def run_filter_fastaq(seqs: dict[str:str], gc_bounds=(0, 100), length_bounds=(0, 2 ** 32), quality_threshold=0) -> dict[str: str]:
+def run_filter_fastaq(input_path: str, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32), quality_threshold=0) -> dict[str: str]:
     """
     Filter DNA sequences based on the GC-content, length and sequencing quality (phred33).
-    :param seqs: sequences to be filtered with their names and quality (dict[str:str])
+    :param input_path: path to the sequences in FASTAQ format
     :param gc_bounds: given threshold for GC-content (tuple/int)
     :param length_bounds: given threshold for length (tuple/int)
     :param quality_threshold: given threshold for quality (int)
     :return: given dict only with sequences that fit all the criteria.
     """
+    seqs = fasq.get_dict(input_path)
     if isinstance(gc_bounds, int):
         gc_bounds = (0, gc_bounds)
     if isinstance(length_bounds, int):
@@ -97,8 +98,9 @@ def run_filter_fastaq(seqs: dict[str:str], gc_bounds=(0, 100), length_bounds=(0,
     for seq_name in seqs.keys():
         gc_result = fasq.gc_test(seqs[seq_name][0], gc_bounds)
         length_result = fasq.length_test(seqs[seq_name][0], length_bounds)
-        quality_result = fasq.quality_test(seqs[seq_name][1], quality_threshold)
+        quality_result = fasq.quality_test(seqs[seq_name][2], quality_threshold)
         if fasq.judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
     return filtered_seqs
+
 

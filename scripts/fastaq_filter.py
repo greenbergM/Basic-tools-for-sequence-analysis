@@ -64,7 +64,6 @@ def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
     with open(fastaq_file_path, mode='r') as fastaq:
         fastaq_dict = {}
         counter = 1
-        commentary = []
         for line in fastaq:
             if counter == 1:
                 name = line.strip('\n')
@@ -73,13 +72,14 @@ def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
                 seq = line.strip('\n')
                 counter += 1
             elif counter == 3:
-                #commentary.append(line.strip('\n'))
+                commentary = line.strip('\n')
                 counter += 1
             elif counter == 4:
                 quality = line.strip('\n')
-                fastaq_dict[name] = (seq, quality)
+                fastaq_dict[name] = (seq, commentary, quality)
                 counter = 1
     return fastaq_dict
+
 
 
 
