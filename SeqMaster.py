@@ -80,10 +80,11 @@ def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], 
     return processed_result[0] if len(processed_result) == 1 else processed_result
 
 
-def run_filter_fastaq(input_path: str, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32), quality_threshold=0) -> dict[str: str]:
+def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32), quality_threshold=0) -> dict[str: str]:
     """
     Filter DNA sequences based on the GC-content, length and sequencing quality (phred33).
     :param input_path: path to the sequences in fastq format
+    :param output_filename: name for output fastq file (str)
     :param gc_bounds: given threshold for GC-content (tuple/int)
     :param length_bounds: given threshold for length (tuple/int)
     :param quality_threshold: given threshold for quality (int)
@@ -101,6 +102,10 @@ def run_filter_fastaq(input_path: str, gc_bounds=(0, 100), length_bounds=(0, 2 *
         quality_result = fasq.quality_test(seqs[seq_name][2], quality_threshold)
         if fasq.judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
-    return filtered_seqs
 
+    fasq.get_file(filtered_seqs, output_filename, input_path)
+    print(f'Filtering completed; {len(filtered_seqs.keys())} sequences were selected from {len(seqs.keys())} given.')
+
+
+run_filter_fastaq(input_path='/Users/polylover/bioinf/example_fastq.fastq', length_bounds=6)
 

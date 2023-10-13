@@ -104,9 +104,9 @@ def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
     if not output_filename.endswith('.fastq'):
         output_filename = output_filename + '.fastq'
 
-    check_dir(os.path.join('SeqMaster', 'fastq_filtrator_resuls'))
+    check_dir('fastq_filtrator_resuls')
 
-    with open(os.path.join('SeqMaster', 'fastq_filtrator_resuls', output_filename), mode='w') as fastq:
+    with open(os.path.join('fastq_filtrator_resuls', output_filename), mode='w') as fastq:
         for seq in filtered_seqs.keys():
             fastq.write(seq + '\n')
             fastq.write(filtered_seqs[seq][0] + '\n')
