@@ -107,5 +107,3 @@ def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100),
     print(f'Filtering completed; {len(filtered_seqs.keys())} sequences were selected from {len(seqs.keys())} given.')
 
 
-run_filter_fastaq(input_path='/Users/polylover/bioinf/example_fastq.fastq', length_bounds=6)
-
