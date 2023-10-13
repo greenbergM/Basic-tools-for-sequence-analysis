@@ -58,8 +58,8 @@ def judge_seq(gc_result: bool, length_result: bool, quality_result: bool) -> boo
 
 def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
     """
-    Converts fastaq file into dict where key is sequence name, and seqs, quality are value
-    :param fastaq_file_path: path to the fastaq file (str)
+    Converts fastq file into dict where key is sequence name, and seqs, quality are value
+    :param fastaq_file_path: path to the fastq file (str)
     :return: dict where key is sequence name, and seqs, quality are value (dict[str:tuple[str, str])
     """
     with open(fastaq_file_path, mode='r') as fastaq:
