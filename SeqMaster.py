@@ -167,3 +167,5 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
         for cds in cds_of_interest:
             fasta.write('>' + cds + ' gene: ' + translation_dict[cds][0] + '\n')
             fasta.write((translation_dict[cds][1].replace('"', '') + '\n'))
+
+    print('FASTA file for neighbour CDSs of given genes is created ')
