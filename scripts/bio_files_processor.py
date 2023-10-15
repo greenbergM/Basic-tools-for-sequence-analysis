@@ -26,10 +26,33 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
         fw.write(seq)
 
 
-def get_cds_list(input_gbk):
+def get_cds_list(input_gbk: str) -> list:
+    """
+    Creates list of all CDS from GBK file.
+    :param input_gbk: path to GBK file (str)
+    :return: list of all CDSs (list)
+    """
     cds_list = []
     with open(input_gbk, mode='r') as gbk:
         for line in gbk:
             if line.startswith("     CDS"):
                 cds_list.append(line.replace(' ', '').strip('\n'))
     return cds_list
+
+
+def get_gene_to_cds_dict(input_gbk: str) -> dict:
+    """
+    Creates dict where genes are keys and CDSs are values from GBK file.
+    :param input_gbk: path to GBK file (str)
+    :return: dict where genes are keys and CDSs are values (dict)
+    """
+    gene_dict = {}
+
+    with open(input_gbk, mode='r') as gbk:
+        for line in gbk:
+            if line.startswith('     CDS'):
+                current_cds = line.replace(' ', '').strip('\n')
+            if '/gene=' in line:
+                current_gene = line.replace(' ', '').strip('\n').strip('/gene=').strip('"')
+                gene_dict[current_gene] = current_cds
+    return gene_dict
