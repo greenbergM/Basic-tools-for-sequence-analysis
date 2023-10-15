@@ -24,3 +24,12 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
             else:
                 seq += line.strip('\n')
         fw.write(seq)
+
+
+def get_cds_list(input_gbk):
+    cds_list = []
+    with open(input_gbk, mode='r') as gbk:
+        for line in gbk:
+            if line.startswith("     CDS"):
+                cds_list.append(line.replace(' ', '').strip('\n'))
+    return cds_list
