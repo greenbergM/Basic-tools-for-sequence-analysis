@@ -1,4 +1,5 @@
 from typing import List, Union
+import os
 import scripts.dna_rna_tools as nucl
 import scripts.protein_tools as prot
 import scripts.fastaq_filter as fasq
@@ -108,9 +109,10 @@ def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100),
     print(f'Filtering completed; {len(filtered_seqs.keys())} sequences were selected from {len(seqs.keys())} given.')
 
 
-def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n_after: int, output_fasta: str):
+def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n_after: int, output_fasta=None):
     """
-    Creates fasta file with neighbor CDSs to given genes from GBK file.
+    Creates fasta file with neighbor CDSs to given genes from GBK file and stores it
+    in fasta_selected_from_gbk directory.
     :param genes: genes of interest that are used for neighbor CDSs search (str)
     :param input_gbk: path to GBK file (str)
     :param n_before: number of neighbor CDSs before gene of interest (int)
@@ -129,7 +131,14 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
         cds_after = cds_list[gene_position + 1:gene_position + n_after + 1]
         cds_of_interest = cds_of_interest + cds_before + cds_after
 
-    with open(output_fasta, mode='w') as fasta:
+    fasq.check_dir('fasta_selected_from_gbk')
+
+    if output_fasta is None:
+        output_fasta = 'CDS_selected_from_gbk.fasta'
+    if not output_fasta.endswith('.fasta'):
+        output_fasta = output_fasta + '.fasta'
+
+    with open(os.path.join('fasta_selected_from_gbk', output_fasta), mode='w') as fasta:
         for cds in cds_of_interest:
             fasta.write('>' + cds + ' gene: ' + translation_dict[cds][0] + '\n')
-            fasta.write(translation_dict[cds][1].replace('"', '') + '\n')
+            fasta.write((translation_dict[cds][1].replace('"', '') + '\n'))
