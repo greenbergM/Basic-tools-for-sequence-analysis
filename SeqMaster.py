@@ -2,6 +2,7 @@ from typing import List, Union
 import scripts.dna_rna_tools as nucl
 import scripts.protein_tools as prot
 import scripts.fastaq_filter as fasq
+import scripts.bio_files_processor as bfp
 
 
 def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
@@ -107,3 +108,28 @@ def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100),
     print(f'Filtering completed; {len(filtered_seqs.keys())} sequences were selected from {len(seqs.keys())} given.')
 
 
+def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n_after: int, output_fasta: str):
+    """
+    Creates fasta file with neighbor CDSs to given genes from GBK file.
+    :param genes: genes of interest that are used for neighbor CDSs search (str)
+    :param input_gbk: path to GBK file (str)
+    :param n_before: number of neighbor CDSs before gene of interest (int)
+    :param n_after: number of neighbor CDSs after gene of interest (int)
+    :param output_fasta: name of the output fasta file
+    """
+    cds_list = bfp.get_cds_list(input_gbk)
+    gene_cds_dict = bfp.get_gene_to_cds_dict(input_gbk)
+    translation_dict = bfp.get_cds_translation_dict(input_gbk)
+    cds_of_interest = []
+
+    for gene in genes:
+        gene_cds = gene_cds_dict[gene]
+        gene_position = cds_list.index(gene_cds)
+        cds_before = cds_list[gene_position - n_before:gene_position]
+        cds_after = cds_list[gene_position + 1:gene_position + n_after + 1]
+        cds_of_interest = cds_of_interest + cds_before + cds_after
+
+    with open(output_fasta, mode='w') as fasta:
+        for cds in cds_of_interest:
+            fasta.write('>' + cds + ' gene: ' + translation_dict[cds][0] + '\n')
+            fasta.write(translation_dict[cds][1].replace('"', '') + '\n')
