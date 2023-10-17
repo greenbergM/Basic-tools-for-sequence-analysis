@@ -21,9 +21,8 @@ def make_location(input_path: str, output_name: str, folder_name: str, commentar
     if rename:
         output_name = os.path.splitext(output_name)[0]
     if not output_name.endswith(file_type):
+        output_name = os.path.splitext(output_name)[0]
         output_name = f'{output_name}{file_type}'
-    else:
-        raise ValueError('Uncorrected file type for output!')
 
     return os.path.join(location, output_name)
 
