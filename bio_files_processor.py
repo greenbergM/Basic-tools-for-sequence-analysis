@@ -59,3 +59,6 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
         output_fasta = output_fasta + '.fasta'
 
     bfp.get_fasta(output_fasta, cds_of_interest, translation_dict)
+
+
+select_genes_from_gbk_to_fasta('dtpD', input_gbk='/Users/polylover/bioinf/python/SeqMaster/true.txt',n_before=1,n_after=1, output_fasta='boobav2')
