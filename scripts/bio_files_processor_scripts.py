@@ -1,6 +1,28 @@
 import os
 
 
+def get_cds_of_interest(gene_list: list, gene_cds_dict: dict, cds_list: list, n_before: int, n_after: int) -> list:
+    """
+    Finds neighbour CDSs for given genes.
+    :param gene_list: genes of interest that are used for neighbor CDSs search (list)
+    :param gene_cds_dict: dict where gene names are keys and CDSs names are values (dict)
+    :param cds_list: list of CDSs (list)
+    :param n_before: number of neighbor CDSs before gene of interest (int)
+    :param n_after: number of neighbor CDSs after gene of interest (int)
+    :return: list of chosen CDSs (list)
+    """
+    cds_of_interest = []
+    for gene in gene_list:
+        gene_cds = gene_cds_dict[gene]
+        gene_position = cds_list.index(gene_cds)
+        if gene_position - n_before < 0:
+            raise ValueError(f'CDCs before {gene} are out of bounds! Use other value for n_before.')
+        cds_before = cds_list[gene_position - n_before:gene_position]
+        cds_after = cds_list[gene_position + 1:gene_position + n_after + 1]
+        cds_of_interest = cds_of_interest + cds_before + cds_after
+    return cds_of_interest
+
+
 def get_cds_translation_dict(input_gbk: str) -> dict:
     """
     Creates dict where CDSs are keys and gene names (if they are presented) and translation sequences

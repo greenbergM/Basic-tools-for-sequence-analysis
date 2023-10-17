@@ -37,9 +37,9 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
     :param n_after: number of neighbor CDSs after gene of interest (int)
     :param output_fasta: name of the output fasta file (str)
     """
+    gene_list = genes
     cds_list = []
     gene_cds_dict = {}
-    cds_of_interest = []
     translation_dict = bfp.get_cds_translation_dict(input_gbk)
 
     with open(input_gbk, mode='r') as gbk:
@@ -51,14 +51,7 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
                 current_gene = line.replace(' ', '').strip('\n').strip('/gene=').strip('"')
                 gene_cds_dict[current_gene] = current_cds
 
-    for gene in genes:
-        gene_cds = gene_cds_dict[gene]
-        gene_position = cds_list.index(gene_cds)
-        if gene_position - n_before < 0:
-            raise ValueError(f'CDCs before {gene} are out of bounds! Use other value for n_before.')
-        cds_before = cds_list[gene_position - n_before:gene_position]
-        cds_after = cds_list[gene_position + 1:gene_position + n_after + 1]
-        cds_of_interest = cds_of_interest + cds_before + cds_after
+        cds_of_interest = bfp.get_cds_of_interest(gene_list, gene_cds_dict, cds_list, n_before, n_after)
 
     os.makedirs('fasta_selected_from_gbk', exist_ok=True)
 
@@ -68,6 +61,3 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
         output_fasta = output_fasta + '.fasta'
 
     bfp.get_fasta(output_fasta, cds_of_interest, translation_dict)
-
-
-select_genes_from_gbk_to_fasta('dtpD', input_gbk='/Users/polylover/bioinf/python/SeqMaster/true.txt',n_before=1,n_after=1, output_fasta='boobav2')
