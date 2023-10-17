@@ -1,3 +1,6 @@
+import os
+
+
 def get_cds_list(input_gbk: str) -> list:
     """
     Creates list of all CDS from GBK file.
@@ -62,3 +65,19 @@ def get_cds_translation_dict(input_gbk: str) -> dict:
                 current_seq += line.replace(' ', '').strip('\n')
     cds_dict[current_cds] = (current_gene, current_seq)
     return cds_dict
+
+
+def get_fasta(output_fasta: str, cds_of_interest: list, translation_dict: dict):
+    """
+    Get FASTA file from given list of CDSs and their translations
+    :param output_fasta: name for output FASTA file (str)
+    :param cds_of_interest: list of cdc that is used for names
+    :param translation_dict: dict where CDSs are keys and gene names (if they are presented) and translation sequences
+    are values from GBK file (dict).
+    """
+    with open(os.path.join('fasta_selected_from_gbk', output_fasta), mode='w') as fasta:
+        for cds in cds_of_interest:
+            fasta.write(f'>{cds} gene: {translation_dict[cds][0]}\n')
+            fasta.write(f'{translation_dict[cds][1].replace('"', '')}\n')
+
+    print('FASTA file for neighbour CDSs of given genes is created ')

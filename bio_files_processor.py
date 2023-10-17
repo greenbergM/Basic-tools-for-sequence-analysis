@@ -58,9 +58,4 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
     if not output_fasta.endswith('.fasta'):
         output_fasta = output_fasta + '.fasta'
 
-    with open(os.path.join('fasta_selected_from_gbk', output_fasta), mode='w') as fasta:
-        for cds in cds_of_interest:
-            fasta.write(f'>{cds} gene: {translation_dict[cds][0]}\n')
-            fasta.write(f'{translation_dict[cds][1].replace('"', '')}\n')
-
-    print('FASTA file for neighbour CDSs of given genes is created ')
+    bfp.get_fasta(output_fasta, cds_of_interest, translation_dict)
