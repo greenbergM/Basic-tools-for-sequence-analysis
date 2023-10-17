@@ -64,6 +64,7 @@ def get_cds_translation_dict(input_gbk: str) -> dict:
             elif translation_start:
                 current_seq += line.replace(' ', '').strip('\n')
     cds_dict[current_cds] = (current_gene, current_seq)
+    print(cds_dict)
     return cds_dict
 
 
@@ -78,6 +79,6 @@ def get_fasta(output_fasta: str, cds_of_interest: list, translation_dict: dict):
     with open(os.path.join('fasta_selected_from_gbk', output_fasta), mode='w') as fasta:
         for cds in cds_of_interest:
             fasta.write(f'>{cds} gene: {translation_dict[cds][0]}\n')
-            fasta.write(f'{translation_dict[cds][1].replace('"', '')}\n')
+            fasta.write(translation_dict[cds][1].replace('"', '') + '\n')
 
     print('FASTA file for neighbour CDSs of given genes is created ')
