@@ -98,6 +98,6 @@ def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
     with open(os.path.join('fastq_filtrator_resuls', output_filename), mode='w') as fastq:
         for name in filtered_seqs.keys():
             fastq.write(name + '\n')
-            fastq.write(filtered_seqs[name][0] + '\n')
-            fastq.write(filtered_seqs[name][1] + '\n')
-            fastq.write(filtered_seqs[name][2] + '\n')
+            fastq.write(f'{filtered_seqs[name][0]}\n')
+            fastq.write(f'{filtered_seqs[name][1]}\n')
+            fastq.write(f'{filtered_seqs[name][2]}\n')
