@@ -62,6 +62,8 @@ def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
         fastaq_dict = {}
         counter = 1
         for line in fastaq:
+            if line == '\n':
+                continue
             if counter == 1:
                 name = line.strip('\n')
                 counter += 1
