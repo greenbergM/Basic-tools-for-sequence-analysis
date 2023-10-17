@@ -2,7 +2,7 @@ import os
 
 
 def make_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str,
-                  rename=False) -> str:
+                  rename_extension=False) -> str:
     """
     Generates location for output file and its name.
     :param input_path: path for input file (str).
@@ -10,7 +10,7 @@ def make_location(input_path: str, output_name: str, folder_name: str, commentar
     :param folder_name: name for folder where output file will be saved (str)
     :param commentary: prefix for output file name (str)
     :param file_type: output file extension (str)
-    :param rename: if output file has different extension from input (bool)
+    :param rename_extension: if output file has different extension from input (bool)
     :return: path to output file (str)
     """
     location = os.path.join(os.path.dirname(input_path), folder_name)
@@ -18,7 +18,7 @@ def make_location(input_path: str, output_name: str, folder_name: str, commentar
 
     if output_name is None:
         output_name = f'{commentary}{os.path.basename(input_path)}'
-    if rename:
+    if rename_extension:
         output_name = os.path.splitext(output_name)[0]
     if not output_name.endswith(file_type):
         output_name = os.path.splitext(output_name)[0]
