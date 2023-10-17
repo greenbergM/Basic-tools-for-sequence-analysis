@@ -1,5 +1,4 @@
 import scripts.bio_files_processor_scripts as bfp
-import os
 
 
 def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
@@ -8,14 +7,11 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
     :param input_fasta: path to the multiline fasta file (str)
     :param output_fasta: name of oneline fasta file (str)
     """
-    if output_fasta is None:
-        output_fasta = f'oneline_{os.path.basename(input_fasta)}'
-    if not output_fasta.endswith('.fasta'):
-        output_fasta += '.fasta'
 
-    location = os.path.dirname(input_fasta)
+    output_location = bfp.make_location(input_fasta, output_fasta, 'oneline_fasta', 'oneline_',
+                                        '.fasta')
     seq = ''
-    with open(input_fasta, mode='r') as fr, open(os.path.join(location, output_fasta), mode='w') as fw:
+    with open(input_fasta, mode='r') as fr, open(output_location, mode='w') as fw:
         for line in fr:
             if line.startswith('>'):
                 if seq:
@@ -25,6 +21,7 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
             else:
                 seq += line.strip('\n')
         fw.write(seq)
+    print('Conversion completed!')
 
 
 def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n_after: int, output_fasta=None):
@@ -53,14 +50,9 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
 
         cds_of_interest = bfp.get_cds_of_interest(gene_list, gene_cds_dict, cds_list, n_before, n_after)
 
-    os.makedirs('fasta_selected_from_gbk', exist_ok=True)
-
-    if output_fasta is None:
-        output_fasta = 'CDS_selected_from_gbk.fasta'
-    if not output_fasta.endswith('.fasta'):
-        output_fasta = output_fasta + '.fasta'
-
-    bfp.get_fasta(output_fasta, cds_of_interest, translation_dict)
+    output_location = bfp.make_location(input_gbk, output_fasta, 'fasta_selected_from_gbk',
+                                        'CDS_selected_from_', '.fasta')
+    bfp.get_fasta(output_location, cds_of_interest, translation_dict)
 
 
 def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
@@ -76,17 +68,11 @@ def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
         seq = lines[1].strip()
         shifted_seq = f'{seq[shift:]}{seq[:shift]}\n'
 
-    location = os.path.dirname(input_fasta)
-    if output_fasta is None:
-        output_fasta = f'Shifted{shift}.fasta'
-    if not output_fasta.endswith('.fasta'):
-        output_fasta = output_fasta + '.fasta'
+    output_location = bfp.make_location(input_fasta, output_fasta, 'shifted_fasta', 'shifted',
+                                        '.fasta')
 
-    with open(os.path.join(location, output_fasta), mode='w') as sfa:
+    with open(output_location, mode='w') as sfa:
         sfa.write(seq_name)
         sfa.write(shifted_seq)
 
-
-
-
-
+    print('Starting position changed!')
