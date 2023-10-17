@@ -1,4 +1,4 @@
-import os
+import scripts.bio_files_processor_scripts as bfp
 
 
 def gc_test(seq: str, gc_bounds: tuple) -> bool:
@@ -88,14 +88,11 @@ def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
     :param input_path: path to the sequences in fastq format
     :return:
     """
-    if output_filename is None:
-        output_filename = os.path.basename(os.path.realpath(input_path))
-    if not output_filename.endswith('.fastq'):
-        output_filename = output_filename + '.fastq'
 
-    os.makedirs('fastq_filtrator_results', exist_ok=True)
+    output_location = bfp.make_location(input_path, output_filename,'fastq_filtrator_results',
+                                        'filtered_', '.fastq')
 
-    with open(os.path.join('fastq_filtrator_resuls', output_filename), mode='w') as fastq:
+    with open(output_location, mode='w') as fastq:
         for name in filtered_seqs.keys():
             fastq.write(name + '\n')
             fastq.write(f'{filtered_seqs[name][0]}\n')
