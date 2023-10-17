@@ -87,13 +87,13 @@ def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100),
     Filter DNA sequences based on the GC-content, length and sequencing quality (phred33).
     :param input_path: path to the sequences in fastq format
     :param output_filename: name for output fastq file (str)
-    :param gc_bounds: given threshold for GC-content (tuple/int)
+    :param gc_bounds: given threshold for GC-content (tuple/int/float)
     :param length_bounds: given threshold for length (tuple/int)
     :param quality_threshold: given threshold for quality (int)
     :return: given dict only with sequences that fit all the criteria.
     """
     seqs = fasq.get_dict(input_path)
-    if isinstance(gc_bounds, int):
+    if isinstance(gc_bounds, (int, float)):
         gc_bounds = (0, gc_bounds)
     if isinstance(length_bounds, int):
         length_bounds = (0, length_bounds)
