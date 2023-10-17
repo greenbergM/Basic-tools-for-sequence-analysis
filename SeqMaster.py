@@ -156,7 +156,7 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
         cds_after = cds_list[gene_position + 1:gene_position + n_after + 1]
         cds_of_interest = cds_of_interest + cds_before + cds_after
 
-    fasq.check_dir('fasta_selected_from_gbk')
+    os.makedirs('fasta_selected_from_gbk', exist_ok=True)
 
     if output_fasta is None:
         output_fasta = 'CDS_selected_from_gbk.fasta'

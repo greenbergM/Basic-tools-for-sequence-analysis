@@ -78,15 +78,6 @@ def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
     return fastaq_dict
 
 
-def check_dir(directory):
-    """
-    Checks if directory exists; if not - makes it
-    :param directory: path to directory
-    """
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-
 def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
     """
     Writes filtered sequences to new fastq file in fastaq_filtered_results directory
@@ -100,7 +91,7 @@ def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
     if not output_filename.endswith('.fastq'):
         output_filename = output_filename + '.fastq'
 
-    check_dir('fastq_filtrator_resuls')
+    os.makedirs('fastq_filtrator_results', exist_ok=True)
 
     with open(os.path.join('fastq_filtrator_resuls', output_filename), mode='w') as fastq:
         for seq in filtered_seqs.keys():
