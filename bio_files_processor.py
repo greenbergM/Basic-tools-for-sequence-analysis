@@ -61,3 +61,32 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
         output_fasta = output_fasta + '.fasta'
 
     bfp.get_fasta(output_fasta, cds_of_interest, translation_dict)
+
+
+def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
+    """
+    Change the starting position of a DNA sequence in a FASTA file.
+    :param input_fasta: Path to the input FASTA file (str).
+    :param shift: The number of positions to shift the sequence (int).
+    :param output_fasta: Name of the output FASTA file (str).
+    """
+    with open(input_fasta, mode='r') as fa:
+        lines = fa.readlines()
+        seq_name = lines[0]
+        seq = lines[1].strip()
+        shifted_seq = f'{seq[shift:]}{seq[:shift]}\n'
+
+    location = os.path.dirname(input_fasta)
+    if output_fasta is None:
+        output_fasta = f'Shifted{shift}.fasta'
+    if not output_fasta.endswith('.fasta'):
+        output_fasta = output_fasta + '.fasta'
+
+    with open(os.path.join(location, output_fasta), mode='w') as sfa:
+        sfa.write(seq_name)
+        sfa.write(shifted_seq)
+
+
+
+
+
