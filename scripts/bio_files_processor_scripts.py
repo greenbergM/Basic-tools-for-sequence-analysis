@@ -1,38 +1,6 @@
 import os
 
 
-def get_cds_list(input_gbk: str) -> list:
-    """
-    Creates list of all CDS from GBK file.
-    :param input_gbk: path to GBK file (str)
-    :return: list of all CDSs (list)
-    """
-    cds_list = []
-    with open(input_gbk, mode='r') as gbk:
-        for line in gbk:
-            if line.startswith("     CDS"):
-                cds_list.append(line.replace(' ', '').strip('\n'))
-    return cds_list
-
-
-def get_gene_to_cds_dict(input_gbk: str) -> dict:
-    """
-    Creates dict where genes are keys and CDSs are values from GBK file.
-    :param input_gbk: path to GBK file (str)
-    :return: dict where genes are keys and CDSs are values (dict)
-    """
-    gene_dict = {}
-
-    with open(input_gbk, mode='r') as gbk:
-        for line in gbk:
-            if line.startswith('     CDS'):
-                current_cds = line.replace(' ', '').strip('\n')
-            if '/gene=' in line:
-                current_gene = line.replace(' ', '').strip('\n').strip('/gene=').strip('"')
-                gene_dict[current_gene] = current_cds
-    return gene_dict
-
-
 def get_cds_translation_dict(input_gbk: str) -> dict:
     """
     Creates dict where CDSs are keys and gene names (if they are presented) and translation sequences
@@ -64,7 +32,6 @@ def get_cds_translation_dict(input_gbk: str) -> dict:
             elif translation_start:
                 current_seq += line.replace(' ', '').strip('\n')
     cds_dict[current_cds] = (current_gene, current_seq)
-    print(cds_dict)
     return cds_dict
 
 

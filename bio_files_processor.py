@@ -37,10 +37,19 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
     :param n_after: number of neighbor CDSs after gene of interest (int)
     :param output_fasta: name of the output fasta file (str)
     """
-    cds_list = bfp.get_cds_list(input_gbk)
-    gene_cds_dict = bfp.get_gene_to_cds_dict(input_gbk)
-    translation_dict = bfp.get_cds_translation_dict(input_gbk)
+    cds_list = []
+    gene_cds_dict = {}
     cds_of_interest = []
+    translation_dict = bfp.get_cds_translation_dict(input_gbk)
+
+    with open(input_gbk, mode='r') as gbk:
+        for line in gbk:
+            if line.startswith('     CDS'):
+                current_cds = line.replace(' ', '').strip('\n')
+                cds_list.append(current_cds)
+            if '/gene=' in line:
+                current_gene = line.replace(' ', '').strip('\n').strip('/gene=').strip('"')
+                gene_cds_dict[current_gene] = current_cds
 
     for gene in genes:
         gene_cds = gene_cds_dict[gene]
