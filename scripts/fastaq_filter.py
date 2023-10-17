@@ -94,8 +94,8 @@ def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
     os.makedirs('fastq_filtrator_results', exist_ok=True)
 
     with open(os.path.join('fastq_filtrator_resuls', output_filename), mode='w') as fastq:
-        for seq in filtered_seqs.keys():
-            fastq.write(seq + '\n')
-            fastq.write(filtered_seqs[seq][0] + '\n')
-            fastq.write(filtered_seqs[seq][1] + '\n')
-            fastq.write(filtered_seqs[seq][2] + '\n')
+        for name in filtered_seqs.keys():
+            fastq.write(name + '\n')
+            fastq.write(filtered_seqs[name][0] + '\n')
+            fastq.write(filtered_seqs[name][1] + '\n')
+            fastq.write(filtered_seqs[name][2] + '\n')
