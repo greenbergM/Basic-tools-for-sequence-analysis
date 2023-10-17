@@ -1,7 +1,7 @@
 import os
 
 
-def generate_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str,
+def make_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str,
                   rename=False) -> str:
     """
     Generates location for output file and its name.
