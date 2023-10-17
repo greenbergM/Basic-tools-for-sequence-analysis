@@ -41,11 +41,11 @@ def get_cds_translation_dict(input_gbk: str) -> dict:
     cds_dict = {}
     current_gene = ''
     current_seq = ''
-    translation = False
+    translation_start = False
     with open(input_gbk, mode='r') as gbk:
         for line in gbk:
             if line.startswith('     CDS'):
-                translation = False
+                translation_start = False
                 if current_seq:
                     cds_dict[current_cds] = (current_gene, current_seq)
                     current_gene = ''
@@ -55,10 +55,10 @@ def get_cds_translation_dict(input_gbk: str) -> dict:
                 current_gene = line.replace(' ', '').strip('\n').strip('/gene=').strip('"')
             elif '/translation' in line:
                 current_seq = line.replace(' ', '').strip('\n').strip('/translation=')
-                translation = True
+                translation_start = True
             elif 'ORIGIN' in line:
-                translation = False
-            elif translation:
+                translation_start = False
+            elif translation_start:
                 current_seq += line.replace(' ', '').strip('\n')
     cds_dict[current_cds] = (current_gene, current_seq)
     return cds_dict
