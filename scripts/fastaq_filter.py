@@ -11,8 +11,7 @@ def gc_test(seq: str, gc_bounds: tuple) -> bool:
     gc_amount = (seq.count('G') + seq.count('C')) / len(seq) * 100
     if gc_amount < gc_bounds[0] or gc_amount > gc_bounds[1]:
         return False
-    else:
-        return True
+    return True
 
 
 def length_test(seq: str, length_bounds: tuple) -> bool:
@@ -24,8 +23,7 @@ def length_test(seq: str, length_bounds: tuple) -> bool:
     """
     if len(seq) < length_bounds[0] or len(seq) > length_bounds[1]:
         return False
-    else:
-        return True
+    return True
 
 
 def quality_test(seq_quality: str, quality_threshold: int) -> bool:
@@ -40,8 +38,7 @@ def quality_test(seq_quality: str, quality_threshold: int) -> bool:
         q_score_list.append(ord(nucleotide_quality) - 33)
     if sum(q_score_list) / len(q_score_list) < quality_threshold:
         return False
-    else:
-        return True
+    return True
 
 
 def judge_seq(gc_result: bool, length_result: bool, quality_result: bool) -> bool:
