@@ -9,11 +9,11 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
     :param output_fasta: name of oneline fasta file (str)
     """
     if output_fasta is None:
-        output_fasta = f'oneline_{os.path.basename(os.path.realpath(input_fasta))}'
+        output_fasta = f'oneline_{os.path.basename(input_fasta)}'
     if not output_fasta.endswith('.fasta'):
         output_fasta += '.fasta'
 
-    location = os.path.dirname(os.path.realpath(input_fasta))
+    location = os.path.dirname(input_fasta)
     seq = ''
     with open(input_fasta, mode='r') as fr, open(os.path.join(location, output_fasta), mode='w') as fw:
         for line in fr:
