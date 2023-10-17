@@ -1,8 +1,7 @@
 import os
 
 
-def make_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str,
-                  rename_extension=False) -> str:
+def make_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str) -> str:
     """
     Generates location for output file and its name.
     :param input_path: path for input file (str).
@@ -10,7 +9,6 @@ def make_location(input_path: str, output_name: str, folder_name: str, commentar
     :param folder_name: name for folder where output file will be saved (str)
     :param commentary: prefix for output file name (str)
     :param file_type: output file extension (str)
-    :param rename_extension: if output file has different extension from input (bool)
     :return: path to output file (str)
     """
     location = os.path.join(os.path.dirname(input_path), folder_name)
@@ -18,8 +16,7 @@ def make_location(input_path: str, output_name: str, folder_name: str, commentar
 
     if output_name is None:
         output_name = f'{commentary}{os.path.basename(input_path)}'
-    if rename_extension:
-        output_name = os.path.splitext(output_name)[0]
+
     if not output_name.endswith(file_type):
         output_name = os.path.splitext(output_name)[0]
         output_name = f'{output_name}{file_type}'
@@ -91,7 +88,7 @@ def get_fasta(output_fasta: str, cds_of_interest: list, translation_dict: dict):
     :param translation_dict: dict where CDSs are keys and gene names (if they are presented) and translation sequences
     are values from GBK file (dict).
     """
-    with open(os.path.join('fasta_selected_from_gbk', output_fasta), mode='w') as fasta:
+    with open(output_fasta, mode='w') as fasta:
         for cds in cds_of_interest:
             fasta.write(f'>{cds} gene: {translation_dict[cds][0]}\n')
             fasta.write(translation_dict[cds][1].replace('"', '') + '\n')
