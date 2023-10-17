@@ -1,6 +1,33 @@
 import os
 
 
+def generate_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str,
+                  rename=False) -> str:
+    """
+    Generates location for output file and its name.
+    :param input_path: path for input file (str).
+    :param output_name: name for output file (str).
+    :param folder_name: name for folder where output file will be saved (str)
+    :param commentary: prefix for output file name (str)
+    :param file_type: output file extension (str)
+    :param rename: if output file has different extension from input (bool)
+    :return: path to output file (str)
+    """
+    location = os.path.join(os.path.dirname(input_path), folder_name)
+    os.makedirs(location, exist_ok=True)
+
+    if output_name is None:
+        output_name = f'{commentary}{os.path.basename(input_path)}'
+    if rename:
+        output_name = os.path.splitext(output_name)[0]
+    if not output_name.endswith(file_type):
+        output_name = f'{output_name}{file_type}'
+    else:
+        raise ValueError('Uncorrected file type for output!')
+
+    return os.path.join(location, output_name)
+
+
 def get_cds_of_interest(gene_list: list, gene_cds_dict: dict, cds_list: list, n_before: int, n_after: int) -> list:
     """
     Finds neighbour CDSs for given genes.
