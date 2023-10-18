@@ -84,3 +84,16 @@ def get_best_blast(input_file: str) -> list:
                 description_start = False
 
     return best_blast_results
+
+
+def write_blast_results(output_file: str, best_blast_results: list):
+    """
+    Writes descriptions of best blast results to a new file.
+    :param output_file: path to output file (str)
+    :param best_blast_results: list of descriptions of best blast results (list)
+    """
+    with open(output_file, mode='w') as blr:
+        for description in best_blast_results:
+            blr.write(f'{description}\n')
+
+    print('Best blast results are filterd!')
