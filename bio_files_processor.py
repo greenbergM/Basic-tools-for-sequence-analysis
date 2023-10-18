@@ -85,6 +85,7 @@ def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
     """
     Change the starting position of a DNA sequence in a FASTA file and stores it
     in shifted_fasta folder in the same directory.
+
     :param input_fasta: path to the input FASTA file (str).
     :param shift: the number of positions to shift the sequence (int).
     :param output_fasta: name of the output FASTA file (str);
@@ -110,6 +111,7 @@ def parse_blast_output(input_file: str, output_file=None, extension='.txt'):
     """
     Writes descriptions of best blast results from blast results file to a new file and stores it
     in best_blast_results folder in the same directory.
+
     :param input_file: path to blast results file (str)
     :param output_file: name for output file (str);
     if not given the output file name will be best_blast_*input file name*.*extension*
