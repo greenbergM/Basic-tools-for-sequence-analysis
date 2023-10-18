@@ -60,3 +60,27 @@ def get_fasta(output_fasta: str, cds_of_interest: list, translation_dict: dict):
             fasta.write(translation_dict[cds][1].replace('"', '') + '\n')
 
     print('FASTA file for neighbour CDSs of given genes is created ')
+
+
+def get_best_blast(input_file: str) -> list:
+    """
+    Gets descriptions of best blast results.
+    :param input_file: path to blast results file (str)
+    :return: list of descriptions of best blast results (list)
+    """
+    best_blast_results = []
+    with open(input_file, mode='r') as blr:
+        query_start = False
+        description_start = False
+        for line in blr:
+            if line.startswith('Query #'):
+                query_start = True
+            elif query_start and line.startswith('Description  '):
+                description_start = True
+            elif query_start and description_start:
+                current_result = line[:60].strip()
+                best_blast_results.append(current_result)
+                query_start = False
+                description_start = False
+
+    return best_blast_results
