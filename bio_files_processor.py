@@ -99,6 +99,16 @@ def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
     print('Starting position changed!')
 
 
-def parse_blast_output(input_file: str, output_file = None):
+def parse_blast_output(input_file: str, output_file=None, extension='.txt'):
+    """
+    Writes descriptions of best blast results from blast results file to a new file
+    :param input_file: path to blast results file (str)
+    :param output_file: name for output file (str)
+    :param extension: extension for output file (str)
+    """
 
-    pass
+    best_blast_results = sorted(bfp.get_best_blast(input_file))
+    output_location = bfp.make_location(input_file, output_file, 'best_blast_results',
+                                        'best_blast_', extension)
+
+    bfp.write_blast_results(output_location, best_blast_results)
