@@ -177,7 +177,7 @@ run_protein_analysis(seq1, seq1, 3, 'calculate_average_hydrophobicity')
 
 #### FASTAQ filter
 
-This func filters DNA sequences based on GC-content, length, and sequencing quality (phred33) from a FASTQ file and saves it in the `fastq_filtrator_results` directory within the same location as the input file.
+This function filters DNA sequences based on GC-content, length, and sequencing quality (phred33) from a FASTQ file and saves it in the `fastq_filtrator_results` directory within the same location as the input file.
 
 
 ##### Usage
@@ -229,7 +229,7 @@ from bio_files_processor import convert_multiline_fasta_to_oneline, select_genes
 
 #### Convert Multiline FASTA to Oneline
 
-This script converts a FASTA file with multiline sequences to a FASTA file with oneline sequences. The resulting file is stored in the `oneline_fasta` directory within the same location as the input file.
+This function converts a FASTA file with multiline sequences to a FASTA file with oneline sequences. The resulting file is stored in the `oneline_fasta` directory within the same location as the input file.
 
 ##### Usage
 
@@ -251,7 +251,7 @@ convert_multiline_fasta_to_oneline('input.fasta', 'output.fasta')
 
 #### Select CDSs from GBK to FASTA
 
-This script extracts neighbor CDSs to specified genes from a GBK file and generates a FASTA file containing the sequences. The resulting file is stored in the `fasta_selected_from_gbk` directory within the same location as the input file.
+This function extracts neighbor CDSs to specified genes from a GBK file and generates a FASTA file containing the sequences. The resulting file is stored in the `fasta_selected_from_gbk` directory within the same location as the input file.
 
 ##### Usage
 
@@ -279,7 +279,7 @@ select_genes_from_gbk_to_fasta('gene1', 'gene2', input_gbk='input.gbk', n_before
 
 #### Shift start position in FASTA Sequence
 
-This script shifts the starting position of a DNA sequence in a FASTA file and saves it in the `shifted_fasta` directory within the same location as the input file.
+This function shifts the starting position of a DNA sequence in a FASTA file and saves it in the `shifted_fasta` directory within the same location as the input file.
 
 **Note**
 Only works with FASTA files containing one sequence!
@@ -313,7 +313,7 @@ change_fasta_start_pos('input.fasta', -2, output_fasta='output.fasta')
 
 #### Parse blast output
 
-This script extracts the descriptions (gene names) of the best BLAST results from a blast results file and saves it in the `best_blast_results` directory within the same location as the input file.
+This function extracts the descriptions (gene names) of the best BLAST results from a blast results file and saves it in the `best_blast_results` directory within the same location as the input file.
 
 ##### Usage
 
