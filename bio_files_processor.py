@@ -34,25 +34,46 @@ def select_genes_from_gbk_to_fasta(*genes: str, input_gbk: str, n_before: int, n
     :param n_after: number of neighbor CDSs after gene of interest (int)
     :param output_fasta: name of the output fasta file (str)
     """
-    gene_list = genes
-    cds_list = []
-    gene_cds_dict = {}
-    translation_dict = bfp.get_cds_translation_dict(input_gbk)
+    gene_list = [genes]
 
+    # list of all CDSs in gbk file
+    cds_list = []
+    # dict where the keys are gene names and values are CDSs
+    gene_cds_dict = {}
+    # dict where the keys are CDSs and values are (gene, translation)
+    cds_translation_dict = {}
+
+    current_gene = ''
+    current_seq = ''
+    translation_start = False
     with open(input_gbk, mode='r') as gbk:
         for line in gbk:
             if line.startswith('     CDS'):
+                translation_start = False
+                if current_seq:
+                    cds_translation_dict[current_cds] = (current_gene, current_seq)
+                    current_gene = ''
+                    current_seq = ''
                 current_cds = line.replace(' ', '').strip('\n')
                 cds_list.append(current_cds)
-            if '/gene=' in line:
+            elif '/gene=' in line:
                 current_gene = line.replace(' ', '').strip('\n').strip('/gene=').strip('"')
                 gene_cds_dict[current_gene] = current_cds
+            elif '/translation' in line:
+                current_seq = line.replace(' ', '').strip('\n').strip('/translation=')
+                translation_start = True
+            elif 'ORIGIN' in line:
+                translation_start = False
+            elif translation_start:
+                current_seq += line.replace(' ', '').strip('\n')
+    cds_translation_dict[current_cds] = (current_gene, current_seq)
 
-        cds_of_interest = bfp.get_cds_of_interest(gene_list, gene_cds_dict, cds_list, n_before, n_after)
+    cds_of_interest = bfp.get_cds_of_interest(gene_list, gene_cds_dict, cds_list, n_before, n_after)
 
     output_location = bfp.make_location(input_gbk, output_fasta, 'fasta_selected_from_gbk',
                                         'CDS_selected_from_', '.fasta')
-    bfp.get_fasta(output_location, cds_of_interest, translation_dict)
+
+    bfp.get_fasta(output_location, cds_of_interest, cds_translation_dict)
 
 
 def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
