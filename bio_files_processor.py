@@ -97,3 +97,8 @@ def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
         sfa.write(shifted_seq)
 
     print('Starting position changed!')
+
+
+def parse_blast_output(input_file: str, output_file = None):
+
+    pass
