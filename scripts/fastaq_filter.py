@@ -1,6 +1,3 @@
-import scripts.bio_files_processor_scripts as bfp
-
-
 def gc_test(seq: str, gc_bounds: tuple) -> bool:
     """
     Check sequence for GC-content.
@@ -55,8 +52,8 @@ def judge_seq(gc_result: bool, length_result: bool, quality_result: bool) -> boo
 def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
     """
     Converts fastq file into dict where key is sequence name, and seqs, quality are value
-    :param fastaq_file_path: path to the fastq file (str)
-    :return: dict where key is sequence name, and seqs, quality are value (dict[str:tuple[str, str])
+    :param fastaq_file_path: path to FASTQ file (str)
+    :return: dict where key is sequence name, and (seqs, quality) are value (dict)
     """
     with open(fastaq_file_path, mode='r') as fastaq:
         fastaq_dict = {}
@@ -80,17 +77,12 @@ def get_dict(fastaq_file_path: str) -> dict[str:tuple[str, str]]:
     return fastaq_dict
 
 
-def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
+def get_file(filtered_seqs: dict, output_location: str):
     """
-    Writes filtered sequences to new fastq file in fastaq_filtered_results directory
+    Writes filtered sequences to FASTQ file.
     :param filtered_seqs: sequences that were filtered (dict)
-    :param output_filename: name for output fastq file (str)
-    :param input_path: path to the sequences in fastq format
-    :return:
+    :param output_location: path to FASTQ file (str)
     """
-
-    output_location = bfp.make_location(input_path, output_filename,'fastq_filtrator_results',
-                                        'filtered_', '.fastq')
 
     with open(output_location, mode='w') as fastq:
         for name in filtered_seqs.keys():
@@ -98,3 +90,4 @@ def get_file(filtered_seqs: dict, output_filename: str, input_path: str):
             fastq.write(f'{filtered_seqs[name][0]}\n')
             fastq.write(f'{filtered_seqs[name][1]}\n')
             fastq.write(f'{filtered_seqs[name][2]}\n')
+

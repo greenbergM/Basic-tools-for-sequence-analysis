@@ -1,8 +1,8 @@
 from typing import List, Union
-import os
 import scripts.dna_rna_tools as nucl
 import scripts.protein_tools as prot
 import scripts.fastaq_filter as fasq
+import scripts.bio_files_processor_scripts as bfp
 
 
 def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
@@ -81,15 +81,18 @@ def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], 
     return processed_result[0] if len(processed_result) == 1 else processed_result
 
 
-def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32), quality_threshold=0) -> dict[str: str]:
+def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32),
+                      quality_threshold=0):
     """
-    Filter DNA sequences based on the GC-content, length and sequencing quality (phred33).
+    Filter DNA sequences based on the GC-content, length and sequencing quality (phred33) from FASTQ file to a new
+    FASTQ file and stores it in fastaq_filtered_results folder in the same directory.
+
     :param input_path: path to the sequences in fastq format
-    :param output_filename: name for output fastq file (str)
+    :param output_filename: name for output fastq file (str);
+    if not given the output file name will be filtered_*input file name*.fastq
     :param gc_bounds: given threshold for GC-content (tuple/int/float)
     :param length_bounds: given threshold for length (tuple/int)
     :param quality_threshold: given threshold for quality (int)
-    :return: given dict only with sequences that fit all the criteria.
     """
     seqs = fasq.get_dict(input_path)
     if isinstance(gc_bounds, (int, float)):
@@ -104,6 +107,10 @@ def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100),
         if fasq.judge_seq(gc_result, length_result, quality_result):
             filtered_seqs[seq_name] = seqs[seq_name]
 
-    fasq.get_file(filtered_seqs, output_filename, input_path)
+    output_location = bfp.make_location(input_path, output_filename,'fastq_filtrator_results',
+                                        'filtered_', '.fastq')
+
+    fasq.get_file(filtered_seqs, output_location)
+
     print(f'Filtering completed; {len(filtered_seqs.keys())} sequences were selected from {len(seqs.keys())} given.')
 
