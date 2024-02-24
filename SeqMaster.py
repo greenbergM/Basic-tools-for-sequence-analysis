@@ -105,11 +105,10 @@ class BiologicalSequence(ABC):
         pass
 
 
-class NucleicAcidSequence(BiologicalSequence):
+class NucleicAcidSequence(BiologicalSequence, ABC):
     def __init__(self, sequence):
         self.sequence = sequence
         self.nucleotide_pairs = {}
-        self.nucleotides = self.nucleotide_pairs.keys()
 
     def __len__(self):
         return len(self.sequence)
@@ -121,8 +120,12 @@ class NucleicAcidSequence(BiologicalSequence):
         return str(self.sequence)
 
     def check_alphabet(self):
-        if set(self.sequence) not in self.nucleotides:
-            raise IncorrectNucleotideError()
+        nucleotides = self.nucleotide_pairs.keys()
+
+        for nucleotide in set(self.sequence):
+            if nucleotide not in nucleotides:
+                raise IncorrectNucleotideError(f"Invalid nucleotide found: {nucleotide}")
+        return True
 
     def complement(self):
         self.check_alphabet()
@@ -136,8 +139,42 @@ class NucleicAcidSequence(BiologicalSequence):
     def get_gc_content(self):
         self.check_alphabet()
 
-        gc_content = SeqUtils.GC(self.sequence)
+        gc_content = SeqUtils.GC(self.sequence.upper())
         return gc_content
+
+
+class DNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
+    def __init__(self, seq):
+        super().__init__(seq)
+        self.complement_pairs = {'A': 'T',
+                                 'a': 't',
+                                 'G': 'C',
+                                 'g': 'c',
+                                 'T': 'A',
+                                 't': 'a',
+                                 'C': 'G',
+                                 'c': 'g'}
+
+    def transcribe(self):
+        transcribed_seq = self.sequence.replace('T', 'U').replace('t', 'u')
+        return RNASequence(transcribed_seq)
+
+
+class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
+    def __init__(self, seq):
+        super().__init__(seq)
+        self.complement_pairs = {'A': 'U',
+                                 'a': 'u',
+                                 'G': 'C',
+                                 'g': 'c',
+                                 'U': 'A',
+                                 'u': 'a',
+                                 'C': 'G',
+                                 'c': 'g'}
+
+
+# class AminoAcidSequence(BiologicalSequence, ABC):
+#     pass
 
 
 def filter_fastq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32),
