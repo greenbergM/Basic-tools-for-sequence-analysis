@@ -111,7 +111,7 @@ def filter_fastq(input_path: str, output_filename=None, gc_bounds=(0, 100), leng
 
     with open(output_file_path, "w") as f:
         for record in SeqIO.parse(input_path, "fastq"):
-            gc_test = gc_bounds[0] < SeqUtils.gc_fraction(record.seq) * 100 < gc_bounds[1]
+            gc_test = gc_bounds[0] < SeqUtils.GC(record.seq) < gc_bounds[1]
             len_test = length_bounds[0] < len(record.seq) < length_bounds[1]
             quality_test = sum(record.letter_annotations["phred_quality"]) / len(record.seq) >= quality_threshold
             if gc_test and len_test and quality_test:
