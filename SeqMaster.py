@@ -1,8 +1,9 @@
 from typing import List, Union
 import scripts.dna_rna_tools as nucl
 import scripts.protein_tools as prot
-import scripts.fastaq_filter as fasq
-import scripts.bio_files_processor_scripts as bfp
+import os
+from Bio import SeqIO
+from Bio import SeqUtils
 
 
 def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
@@ -81,36 +82,37 @@ def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], 
     return processed_result[0] if len(processed_result) == 1 else processed_result
 
 
-def run_filter_fastaq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32),
-                      quality_threshold=0):
+def filter_fastq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32),
+                 quality_threshold=0):
     """
-    Filter DNA sequences based on the GC-content, length and sequencing quality (phred33) from FASTQ file to a new
-    FASTQ file and stores it in fastaq_filtered_results folder in the same directory.
+        Filter DNA sequences based on the GC-content, length and sequencing quality (phred33) from FASTQ file to a new
+        FASTQ file and stores it in fastaq_filtered_results folder in the same directory.
 
-    :param input_path: path to the sequences in fastq format
-    :param output_filename: name for output fastq file (str);
-    if not given the output file name will be filtered_*input file name*.fastq
-    :param gc_bounds: given threshold for GC-content (tuple/int/float)
-    :param length_bounds: given threshold for length (tuple/int)
-    :param quality_threshold: given threshold for quality (int)
-    """
-    seqs = fasq.get_dict(input_path)
+        :param input_path: path to the sequences in fastq format
+        :param output_filename: name for output fastq file (str);
+        if not given the output file name will be filtered_*input file name*.fastq
+        :param gc_bounds: given threshold for GC-content (tuple/int/float)
+        :param length_bounds: given threshold for length (tuple/int)
+        :param quality_threshold: given threshold for quality (int)
+        """
+
     if isinstance(gc_bounds, (int, float)):
         gc_bounds = (0, gc_bounds)
     if isinstance(length_bounds, int):
         length_bounds = (0, length_bounds)
-    filtered_seqs = dict()
-    for seq_name in seqs.keys():
-        gc_result = fasq.gc_test(seqs[seq_name][0], gc_bounds)
-        length_result = fasq.length_test(seqs[seq_name][0], length_bounds)
-        quality_result = fasq.quality_test(seqs[seq_name][2], quality_threshold)
-        if fasq.judge_seq(gc_result, length_result, quality_result):
-            filtered_seqs[seq_name] = seqs[seq_name]
 
-    output_location = bfp.make_location(input_path, output_filename,'fastq_filtrator_results',
-                                        'filtered_', '.fastq')
+    output_dir = os.path.join(os.path.dirname(input_path), 'fastq_filtrator_results')
+    os.makedirs(output_dir, exist_ok=True)
 
-    fasq.get_file(filtered_seqs, output_location)
+    if output_filename:
+        output_file_path = os.path.join(output_dir, output_filename)
+    else:
+        output_file_path = os.path.join(output_dir, f'filtered_{os.path.basename(input_path)}')
 
-    print(f'Filtering completed; {len(filtered_seqs.keys())} sequences were selected from {len(seqs.keys())} given.')
-
+    with open(output_file_path, "w") as f:
+        for record in SeqIO.parse(input_path, "fastq"):
+            gc_test = gc_bounds[0] < SeqUtils.gc_fraction(record.seq) * 100 < gc_bounds[1]
+            len_test = length_bounds[0] < len(record.seq) < length_bounds[1]
+            quality_test = sum(record.letter_annotations["phred_quality"]) / len(record.seq) >= quality_threshold
+            if gc_test and len_test and quality_test:
+                SeqIO.write(record, f, "fastq")
