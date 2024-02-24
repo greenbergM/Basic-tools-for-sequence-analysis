@@ -1,6 +1,4 @@
 from typing import List, Union
-import scripts.dna_rna_tools as nucl
-import scripts.protein_tools as prot
 import os
 from Bio import SeqIO
 from Bio import SeqUtils
