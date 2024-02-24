@@ -7,84 +7,93 @@ from Bio import SeqUtils
 from abc import ABC, abstractmethod
 
 
-def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
-    """
-    Launch desired operation with nucleic acid sequences. Pass comma-separated sequences,
-    additional argument (if certain function requires it) and specify function name you want to apply to all sequences.
-    Pass arguments strictly in this order, otherwise it won't be parsed.
-
-    :param args:
-    - nucleic acid sequences for analysis (str)
-    - operation name (str): specify procedure you want to apply (str)
-    :param seq_type: type of desired complement sequence (for complement function) (str)
-
-    :return: the result of procedure in list or str format
-    """
-    seqs = args[:-1]
-    tool = args[-1]
-    seqs_identity = nucl.nucl_acid_identity(seqs)
-    if tool == 'nucl_acid_identity':
-        return seqs_identity
-    elif tool == 'complement':
-        return nucl.complement(seqs, seq_type)
-    elif tool == 'reverse_complement':
-        return nucl.reverse_complement(seqs, seq_type)
-    elif tool == 'transcribe':
-        return nucl.transcribe(seqs, seqs_identity)
-    elif tool == 'reverse':
-        return nucl.reverse(seqs)
-    elif tool == 'gc_content':
-        return nucl.gc_content(seqs)
-    else:
-        raise ValueError(f'There is no {tool} tool available!')
-
-
-def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], str, list[float], float]:
-    """
-    Launch desired operation with proteins sequences. Pass comma-separated sequences,
-    additional argument (if certain function requires it) and specify function name you want to apply to all sequences.
-    Pass arguments strictly in this order, otherwise it won't be parsed.
-
-    :param args:
-    - seq (str): amino acids sequences for analysis in 1-letter or 3-letter code (as many as you wish)
-    - curr_encoding (int): type of encoding of given protein sequences
-    - operation name (str): specify procedure you want to apply
-    :param site_of_interest: one letter encoding of desired site (for find_site function)
-    :return: the result of procedure in list or str format
-    """
-    tool = args[-1]
-    curr_encoding = args[-2]
-    seqs = args[:-2]
-    processed_result = []
-    for seq in seqs:
-        if not prot.is_protein(seq, curr_encoding):
-            raise ValueError('Please, use protein sequences!')
-    seqs = prot.change_encoding(seqs, curr_encoding)
-    if tool == 'get_seq_characteristic':
-        for seq in seqs:
-            processed_result.append(prot.get_seq_characteristic(seq))
-    elif tool == 'find_site':
-        for seq in seqs:
-            processed_result.append(prot.find_site(seq, site_of_interest))
-    elif tool == 'calculate_protein_mass':
-        for seq in seqs:
-            processed_result.append(prot.calculate_protein_mass(seq))
-    elif tool == 'calculate_average_hydrophobicity':
-        for seq in seqs:
-            processed_result.append(prot.calculate_average_hydrophobicity(seq))
-    elif tool == 'calculate_isoelectric_point':
-        for seq in seqs:
-            processed_result.append(prot.calculate_isoelectric_point(seq))
-    elif tool == 'get_mrna':
-        for seq in seqs:
-            processed_result.append(prot.get_mrna(seq))
-    else:
-        raise ValueError(f'{tool} operation is not available!')
-    return processed_result[0] if len(processed_result) == 1 else processed_result
+# def run_dna_rna_tools(*args: str, seq_type='DNA') -> Union[list[str], str, list[float], float]:
+#     """
+#     Launch desired operation with nucleic acid sequences. Pass comma-separated sequences,
+#     additional argument (if certain function requires it) and specify function name you want to apply to all sequences.
+#     Pass arguments strictly in this order, otherwise it won't be parsed.
+#
+#     :param args:
+#     - nucleic acid sequences for analysis (str)
+#     - operation name (str): specify procedure you want to apply (str)
+#     :param seq_type: type of desired complement sequence (for complement function) (str)
+#
+#     :return: the result of procedure in list or str format
+#     """
+#     seqs = args[:-1]
+#     tool = args[-1]
+#     seqs_identity = nucl.nucl_acid_identity(seqs)
+#     if tool == 'nucl_acid_identity':
+#         return seqs_identity
+#     elif tool == 'complement':
+#         return nucl.complement(seqs, seq_type)
+#     elif tool == 'reverse_complement':
+#         return nucl.reverse_complement(seqs, seq_type)
+#     elif tool == 'transcribe':
+#         return nucl.transcribe(seqs, seqs_identity)
+#     elif tool == 'reverse':
+#         return nucl.reverse(seqs)
+#     elif tool == 'gc_content':
+#         return nucl.gc_content(seqs)
+#     else:
+#         raise ValueError(f'There is no {tool} tool available!')
+#
+#
+# def run_protein_analysis(*args: str, site_of_interest=None) -> Union[List[str], str, list[float], float]:
+#     """
+#     Launch desired operation with proteins sequences. Pass comma-separated sequences,
+#     additional argument (if certain function requires it) and specify function name you want to apply to all sequences.
+#     Pass arguments strictly in this order, otherwise it won't be parsed.
+#
+#     :param args:
+#     - seq (str): amino acids sequences for analysis in 1-letter or 3-letter code (as many as you wish)
+#     - curr_encoding (int): type of encoding of given protein sequences
+#     - operation name (str): specify procedure you want to apply
+#     :param site_of_interest: one letter encoding of desired site (for find_site function)
+#     :return: the result of procedure in list or str format
+#     """
+#     tool = args[-1]
+#     curr_encoding = args[-2]
+#     seqs = args[:-2]
+#     processed_result = []
+#     for seq in seqs:
+#         if not prot.is_protein(seq, curr_encoding):
+#             raise ValueError('Please, use protein sequences!')
+#     seqs = prot.change_encoding(seqs, curr_encoding)
+#     if tool == 'get_seq_characteristic':
+#         for seq in seqs:
+#             processed_result.append(prot.get_seq_characteristic(seq))
+#     elif tool == 'find_site':
+#         for seq in seqs:
+#             processed_result.append(prot.find_site(seq, site_of_interest))
+#     elif tool == 'calculate_protein_mass':
+#         for seq in seqs:
+#             processed_result.append(prot.calculate_protein_mass(seq))
+#     elif tool == 'calculate_average_hydrophobicity':
+#         for seq in seqs:
+#             processed_result.append(prot.calculate_average_hydrophobicity(seq))
+#     elif tool == 'calculate_isoelectric_point':
+#         for seq in seqs:
+#             processed_result.append(prot.calculate_isoelectric_point(seq))
+#     elif tool == 'get_mrna':
+#         for seq in seqs:
+#             processed_result.append(prot.get_mrna(seq))
+#     else:
+#         raise ValueError(f'{tool} operation is not available!')
+#     return processed_result[0] if len(processed_result) == 1 else processed_result
 
 
 class IncorrectNucleotideError(ValueError):
     pass
+
+
+class IncorrectAminoacidEncodingError(ValueError):
+    pass
+
+
+class IncorrectAminoacidError(ValueError):
+    pass
+
 
 
 class BiologicalSequence(ABC):
@@ -173,8 +182,56 @@ class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
                                  'c': 'g'}
 
 
-# class AminoAcidSequence(BiologicalSequence, ABC):
-#     pass
+class AminoAcidSequence(BiologicalSequence, ABC):
+    def __init__(self, sequence, encoding):
+        self.sequence = sequence
+        self.encoding = encoding
+        self.residue_names = {'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C', 'GLN': 'Q', 'GLU': 'E',
+                              'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F',
+                              'PRO': 'P', 'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V'}
+        self.residue_mass = {'A': 89, 'R': 174, 'N': 132, 'D': 133, 'C': 121, 'Q': 146, 'E': 147, 'G': 75, 'H': 155,
+                             'I': 131, 'L': 131, 'K': 146, 'M': 149, 'F': 165, 'P': 115, 'S': 105, 'T': 119, 'W': 204,
+                             'Y': 181, 'V': 117}
+
+    def _reformat_based_on_encoding(self):
+        if self.encoding == 1:
+            return self.sequence
+        elif self.encoding == 3:
+            amino_acid_list = [self.sequence[letter:letter + 3] for letter in range(0, len(self.sequence), 3)]
+            return amino_acid_list
+        else:
+            raise IncorrectAminoacidEncodingError(f'{self.encoding}-letter encoding is unavailable. '
+                                                  f'Please, use 1 or 3 letter encoding ')
+
+    def _make_one_letter(self):
+        if self.encoding == 3:
+            one_letter_seq = str()
+            for aminoacid in self._reformat_based_on_encoding():
+                one_letter_seq += self.residue_names[aminoacid]
+            return one_letter_seq
+        return self.sequence
+
+    def __len__(self):
+        return len(self._reformat_based_on_encoding())
+
+    def __getitem__(self, index):
+        return self._reformat_based_on_encoding()[index]
+
+    def __str__(self):
+        return str(self.sequence)
+
+    def check_alphabet(self):
+        aminoacids = set(self._reformat_based_on_encoding())
+        for aminoacid in aminoacids:
+            if aminoacid not in self.residue_names.keys() and aminoacid not in self.residue_names.values():
+                raise IncorrectAminoacidError(f'{aminoacid} is not a supported aminoacid!')
+
+    def get_molecular_mass(self):
+        sequence = self._make_one_letter()
+        mass = 0
+        for aminoacid in sequence:
+            mass += self.residue_mass[aminoacid]
+        return mass
 
 
 def filter_fastq(input_path: str, output_filename=None, gc_bounds=(0, 100), length_bounds=(0, 2 ** 32),
