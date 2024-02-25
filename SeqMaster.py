@@ -92,7 +92,7 @@ class NucleicAcidSequence(BiologicalSequence, ABC):
 
 class DNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
     def __init__(self, sequence: str):
-        super().__init__(seq)
+        super().__init__(sequence)
         self._nucleotide_pairs = {
             "A": "T",
             "a": "t",
@@ -114,7 +114,7 @@ class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
     """Class representing an RNA sequence."""
 
     def __init__(self, sequence: str):
-        super().__init__(seq)
+        super().__init__(sequence)
         self._nucleotide_pairs = {
             "A": "U",
             "a": "u",
@@ -184,7 +184,7 @@ class AminoAcidSequence(BiologicalSequence, ABC):
             return self.sequence
         elif self.encoding == 3:
             amino_acid_list = [
-                self.sequence[letter : letter + 3]
+                self.sequence[letter: letter + 3]
                 for letter in range(0, len(self.sequence), 3)
             ]
             return amino_acid_list
