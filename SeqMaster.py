@@ -3,6 +3,17 @@ import os
 from Bio import SeqIO
 from Bio import SeqUtils
 from abc import ABC, abstractmethod
+import sys
+import requests
+import datetime
+import io
+from dataclasses import dataclass
+import pandas as pd
+from bs4 import BeautifulSoup
+import re
+
+
+### HW14
 
 
 class IncorrectNucleotideError(ValueError):
@@ -47,7 +58,7 @@ class BiologicalSequence(ABC):
         pass
 
 
-class NucleicAcidSequence(BiologicalSequence, ABC):
+class NucleicAcidSequence(BiologicalSequence):
     """Class representing a nucleic acid sequence."""
 
     def __init__(self, sequence: str):
@@ -90,7 +101,7 @@ class NucleicAcidSequence(BiologicalSequence, ABC):
         return gc_content
 
 
-class DNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
+class DNASequence(NucleicAcidSequence):
     def __init__(self, sequence: str):
         super().__init__(sequence)
         self._nucleotide_pairs = {
@@ -110,7 +121,7 @@ class DNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
         return RNASequence(transcribed_seq)
 
 
-class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
+class RNASequence(NucleicAcidSequence):
     """Class representing an RNA sequence."""
 
     def __init__(self, sequence: str):
@@ -127,7 +138,7 @@ class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
         }
 
 
-class AminoAcidSequence(BiologicalSequence, ABC):
+class AminoAcidSequence(BiologicalSequence):
     """Class representing an amino acid sequence."""
 
     def __init__(self, sequence, encoding):
@@ -184,7 +195,7 @@ class AminoAcidSequence(BiologicalSequence, ABC):
             return self.sequence
         elif self.encoding == 3:
             amino_acid_list = [
-                self.sequence[letter: letter + 3]
+                self.sequence[letter : letter + 3]
                 for letter in range(0, len(self.sequence), 3)
             ]
             return amino_acid_list
@@ -281,3 +292,251 @@ def filter_fastq(
             )
             if gc_test and len_test and quality_test:
                 SeqIO.write(record, f, "fastq")
+
+
+### HW17
+
+
+@dataclass
+class GenscanOutput:
+    """
+    Data class to store the output of the Genscan analysis.
+
+    Attributes:
+        status (int): HTTP response status code.
+        exon_data (Union[pd.DataFrame, str]): Dataframe containing exon information or error message.
+        intron_data (Union[pd.DataFrame, str]): Dataframe containing intron information or error message.
+        cds_list (Union[List[str], str]): List of CDS sequences or error message.
+    """
+
+    status: int
+    exon_data: Union[pd.DataFrame, str]
+    intron_data: Union[pd.DataFrame, str]
+    cds_list: Union[List[str], str]
+
+
+def _get_exon_data(text_results: str) -> Union[pd.DataFrame, str]:
+    """
+    Extracts exon data from the Genscan analysis results.
+
+    Args:
+        text_results (str): Text version of the Genscan analysis results.
+
+    Returns:
+        Union[pd.DataFrame, str]: Dataframe containing exon information or error message.
+    """
+
+    exon_text = re.findall(
+        r"^\s*\d+\.\d+\s+\w+\s+[+-]\s+\d+\s+\d+", text_results, flags=re.MULTILINE
+    )
+
+    exon_list = [line.split()[:5] for line in exon_text]
+    exon_list = [sublist for sublist in exon_list if sublist[1] not in {"Prom", "PlyA"}]
+
+    if len(exon_list) != 0:
+        exon_data = pd.DataFrame(
+            exon_list, columns=["Number", "Type", "Strand", "Start", "End"]
+        )
+    else:
+        exon_data = "No exons found!"
+
+    return exon_data
+
+
+def _get_intron_data(exon_df: pd.DataFrame) -> Union[pd.DataFrame, str]:
+    """
+    Generates intron data based on exon data. Takes into account the details
+    regarding the exon's location on the DNA strand and within the gene.
+
+    Args:
+        exon_df (pd.DataFrame): Dataframe containing exon information.
+
+    Returns:
+        Union[pd.DataFrame, str]: Dataframe containing intron information or error message.
+    """
+    intron_list = []
+    for i in range(exon_df.shape[0] - 1):
+        current_exon = exon_df.iloc[i]
+        next_exon = exon_df.iloc[i + 1]
+
+        current_exon_gene = current_exon["Number"].split(".")[0]
+        next_exon_gene = next_exon["Number"].split(".")[0]
+
+        if (current_exon["Strand"] == next_exon["Strand"]) and (
+            current_exon_gene == next_exon_gene
+        ):
+            if current_exon["Strand"] == "+":
+                intron_number = current_exon["Number"]
+                intron_list.append(
+                    [
+                        intron_number,
+                        current_exon["Strand"],
+                        int(current_exon["End"]) + 1,
+                        int(next_exon["Start"]) - 1,
+                    ]
+                )
+            else:
+                intron_number = next_exon["Number"]
+                intron_list.append(
+                    [
+                        intron_number,
+                        current_exon["Strand"],
+                        int(next_exon["End"]) - 1,
+                        int(current_exon["Start"]) + 1,
+                    ]
+                )
+
+    if len(intron_list) != 0:
+        intron_data = pd.DataFrame(
+            intron_list, columns=["Number", "Strand", "Start", "End"]
+        )
+    else:
+        intron_data = "No introns found!"
+
+    return intron_data
+
+
+def _get_cds_list(text_results: str) -> Union[List[str], str]:
+    """
+    Extracts CDS list from the Genscan analysis results.
+
+    Args:
+        text_results (str): Text results of the Genscan analysis.
+
+    Returns:
+        Union[List[str], str]: List of CDS sequences or error message.
+    """
+
+    cds_list = re.findall(r"^>.+\n([\w\s\n]+)", text_results, flags=re.MULTILINE)
+    cds_list = [cd.strip().replace("\n", "") for cd in cds_list]
+
+    if len(cds_list) == 0:
+        cds_list = "No CDS found!"
+
+    return cds_list
+
+
+def run_genscan(
+    sequence=None,
+    sequence_file=None,
+    organism="Vertebrate",
+    exon_cutoff=1.00,
+    sequence_name="",
+):
+    """
+    Runs the Genscan online tools to get information about exons and translated cds in sequence.
+    Additionally, provides info about introns based on aquired exons. All results are stored in GenscanOutput object.
+
+    Args:
+        sequence (str, optional): DNA sequence. Defaults to None.
+
+        sequence_file (str, optional): Path to a file containing the DNA sequence. Defaults to None.
+
+        organism (str, optional): Organism for the analysis. Defaults to "Vertebrate".
+                                    Other options are "Arabidopsis" and "Maize".
+
+        exon_cutoff (float, optional): Exon cutoff value. Defaults to 1.00.
+                                    Other options are 0.01, 0.02, 0.05, 0.1, 0.25, 0.5.
+
+        sequence_name (str, optional): Name of the sequence. Defaults to "".
+
+    Returns:
+        GenscanOutput: Output of the Genscan analysis.
+    """
+    if sequence_file:
+        with open(sequence_file, "r") as file:
+            sequence = file.read()
+
+    data = {
+        "-s": sequence,
+        "-o": organism,
+        "-e": exon_cutoff,
+        "-n": sequence_name,
+        "-p": "Predicted peptides only",
+    }
+
+    response = requests.post(
+        "http://hollywood.mit.edu/cgi-bin/genscanw_py.cgi", data=data
+    )
+
+    response_status = response.status_code
+    if response_status != 200:
+        return GenscanOutput(response_status, "Error", "Error", "Error")
+
+    soup = BeautifulSoup(response.content, "lxml")
+    analysis_results = soup.find("pre").text
+
+    exon_data = _get_exon_data(analysis_results)
+    if isinstance(exon_data, pd.DataFrame) and len(exon_data) > 1:
+        intron_data = _get_intron_data(exon_data)
+    else:
+        intron_data = "No introns found!"
+
+    cds_list = _get_cds_list(analysis_results)
+
+    return GenscanOutput(response_status, exon_data, intron_data, cds_list)
+
+
+def telegram_logger(chat_id):
+    """Decorator factory function to log function execution details and errors to a Telegram chat."""
+
+    def decorator(func):
+        def inner_func(*args, **kwargs):
+            func_name = func.__name__
+            bot_token = os.getenv("TOKEN")  # os.environ["TOKEN"] = ...
+            buffer = io.StringIO()
+            sys.stdout = buffer
+            sys.stderr = buffer
+
+            start = datetime.datetime.now()
+
+            try:
+                result = func(*args, **kwargs)
+                end = datetime.datetime.now()
+                message = (
+                    f"Process <code>{func_name}</code> completed"
+                    f"\nProcess execution time: {end - start}"
+                )
+
+                _send_message_log(bot_token, func_name, chat_id, message, buffer)
+
+                return result
+
+            except Exception as error:
+                end = datetime.datetime.now()
+                message = (
+                    f"ERROR occurred in <code>{func_name}</code>:"
+                    f"\n<code>{repr(error)}</code>"
+                    f"\nProcess execution time: {end - start}"
+                )
+
+                _send_message_log(bot_token, func_name, chat_id, message, buffer)
+
+                raise
+
+        return inner_func
+
+    return decorator
+
+
+def _send_message_log(
+    bot_token: str, func_name: str, chat_id: int, message: str, buffer: io.StringIO
+) -> None:
+    """Send a message to a Telegram chat."""
+
+    import requests
+
+    requests.post(
+        f"https://api.telegram.org/bot{bot_token}/sendMessage",
+        data={"chat_id": chat_id, "text": message, "parse_mode": "HTML"},
+    )
+
+    if buffer.getvalue():
+        log_name = f"{func_name}.log"
+        log = (log_name, buffer)
+        buffer.seek(0)
+        requests.post(
+            f"https://api.telegram.org/bot{bot_token}/sendDocument",
+            data={"chat_id": chat_id},
+            files={"document": log},
+        )
