@@ -1,4 +1,4 @@
-from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.tree import DecisionTreeClassifier
@@ -39,28 +39,26 @@ class RandomForestClassifierCustom(BaseEstimator):
             for i in range(self.n_estimators)
         ]
 
-        with Pool(n_jobs) as p:
-            results = p.starmap(self._fit_tree, args)
+        with ThreadPoolExecutor(n_jobs) as pool:
+            results = pool.map(self._fit_tree, *zip(*args))
 
         self.trees, self.feat_ids_by_tree = zip(*results)
 
         return self
 
-    def _predict_proba_tree(self, tree_feat, X):
-        tree, feat_idx = tree_feat
+    def _predict_proba(self, args):
+        tree, feat_idx, X = args
         return tree.predict_proba(X[:, feat_idx])
 
     def predict_proba(self, X, n_jobs=1):
-        with Pool(n_jobs) as p:
-            probas_per_tree = p.starmap(
-                self._predict_proba_tree,
-                [
-                    (tree_feat, X)
-                    for tree_feat in zip(self.trees, self.feat_ids_by_tree)
-                ],
-            )
+        args = []
+        for tree, feat_idx in zip(self.trees, self.feat_ids_by_tree):
+            args.append((tree, feat_idx, X))
 
-        return np.mean(probas_per_tree, axis=0)
+        with ThreadPoolExecutor(n_jobs) as pool:
+            probas = list(pool.map(self._predict_proba, args))
+
+        return np.mean(probas, axis=0)
 
     def predict(self, X, n_jobs=1):
         probas = self.predict_proba(X, n_jobs)
