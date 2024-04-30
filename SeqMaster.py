@@ -55,7 +55,7 @@ class BiologicalSequence(ABC):
         pass
 
 
-class NucleicAcidSequence(BiologicalSequence, ABC):
+class NucleicAcidSequence(BiologicalSequence):
     """Class representing a nucleic acid sequence."""
 
     def __init__(self, sequence: str):
@@ -98,7 +98,7 @@ class NucleicAcidSequence(BiologicalSequence, ABC):
         return gc_content
 
 
-class DNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
+class DNASequence(NucleicAcidSequence):
     def __init__(self, sequence: str):
         super().__init__(sequence)
         self._nucleotide_pairs = {
@@ -118,7 +118,7 @@ class DNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
         return RNASequence(transcribed_seq)
 
 
-class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
+class RNASequence(NucleicAcidSequence):
     """Class representing an RNA sequence."""
 
     def __init__(self, sequence: str):
@@ -135,7 +135,7 @@ class RNASequence(NucleicAcidSequence, BiologicalSequence, ABC):
         }
 
 
-class AminoAcidSequence(BiologicalSequence, ABC):
+class AminoAcidSequence(BiologicalSequence):
     """Class representing an amino acid sequence."""
 
     def __init__(self, sequence, encoding):
