@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from scripts.bio_files_processor_scripts import (
+from additional_scripts.bio_files_processor_scripts import (
     make_location,
     get_fasta,
     get_best_blast,
