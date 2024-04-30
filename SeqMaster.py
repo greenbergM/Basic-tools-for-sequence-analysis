@@ -192,7 +192,7 @@ class AminoAcidSequence(BiologicalSequence, ABC):
             return self.sequence
         elif self.encoding == 3:
             amino_acid_list = [
-                self.sequence[letter: letter + 3]
+                self.sequence[letter : letter + 3]
                 for letter in range(0, len(self.sequence), 3)
             ]
             return amino_acid_list
@@ -471,48 +471,62 @@ def run_genscan(
     return GenscanOutput(response_status, exon_data, intron_data, cds_list)
 
 
-bot_token = ""
-
-
 def telegram_logger(chat_id):
+    """Decorator factory function to log function execution details and errors to a Telegram chat."""
+
     def decorator(func):
-        def inner_func():
+        def inner_func(*args, **kwargs):
+            func_name = func.__name__
+            bot_token = os.getenv("TOKEN")  # os.environ["TOKEN"] = ...
             buffer = io.StringIO()
             sys.stdout = buffer
             sys.stderr = buffer
 
             start = datetime.datetime.now()
+
             try:
-                func()
+                result = func(*args, **kwargs)
+                end = datetime.datetime.now()
+                message = (
+                    f"Process <code>{func_name}</code> completed"
+                    f"\nProcess execution time: {end - start}"
+                )
+
+                _send_telegram_message(bot_token, func_name, chat_id, message, buffer)
+
+                return result
+
             except Exception as error:
                 end = datetime.datetime.now()
                 message = (
-                    f"ERROR occurred in <code>{func.__name__}</code>:"
+                    f"ERROR occurred in <code>{func_name}</code>:"
                     f"\n<code>{repr(error)}</code>"
                     f"\nProcess execution time: {end - start}"
-                )  # datetime.timedelta(days=3)
-            else:
-                end = datetime.datetime.now()
-                message = (
-                    f"Process <code>{func.__name__}</code> completed"
-                    f"\nProcess execution time: {end - start}"
-                )  # datetime.timedelta(days=3)
-
-            requests.post(
-                f"https://api.telegram.org/bot{bot_token}/sendMessage",
-                data={"chat_id": chat_id, "text": message, "parse_mode": "HTML"},
-            )
-
-            if buffer.getvalue():
-                log_name = f"{func.__name__}.log"
-                log = (log_name, buffer)
-                buffer.seek(0)
-                requests.post(
-                    f"https://api.telegram.org/bot{bot_token}/sendDocument",
-                    data={"chat_id": chat_id},
-                    files={"document": log},
                 )
+
+                _send_telegram_message(bot_token, func_name, chat_id, message, buffer)
+
+                raise
 
         return inner_func
 
     return decorator
+
+
+def _send_telegram_message(bot_token, func_name, chat_id, message, buffer):
+    """Send a message to a Telegram chat."""
+
+    requests.post(
+        f"https://api.telegram.org/bot{bot_token}/sendMessage",
+        data={"chat_id": chat_id, "text": message, "parse_mode": "HTML"},
+    )
+
+    if buffer.getvalue():
+        log_name = f"{func_name}.log"
+        log = (log_name, buffer)
+        buffer.seek(0)
+        requests.post(
+            f"https://api.telegram.org/bot{bot_token}/sendDocument",
+            data={"chat_id": chat_id},
+            files={"document": log},
+        )
