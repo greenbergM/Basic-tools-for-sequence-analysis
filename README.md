@@ -23,7 +23,7 @@ Script that contains my realisation of RandomForestClassifier with integrated mu
 
 ## Showcase
 
-`Showcases.ipynb` notebook contains some examples for `SeqMaster.py`, `bio_files_processor.py` and `custom_random_forest.py`. `Data` folder contains some files for demonstration
+`Showcases.ipynb` notebook contains some examples for `SeqMaster.py`, `bio_files_processor.py` and `custom_random_forest.py`. `Data` folder contains some files for demonstration.
 
 ## Testing 
 
