@@ -519,8 +519,12 @@ def telegram_logger(chat_id):
     return decorator
 
 
-def _send_message_log(bot_token, func_name, chat_id, message, buffer):
+def _send_message_log(
+    bot_token: str, func_name: str, chat_id: int, message: str, buffer: io.StringIO
+) -> None:
     """Send a message to a Telegram chat."""
+
+    import requests
 
     requests.post(
         f"https://api.telegram.org/bot{bot_token}/sendMessage",

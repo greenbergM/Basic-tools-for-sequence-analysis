@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from additional_scripts.bio_files_processor_scripts import (
     make_location,
     get_fasta,
@@ -111,7 +112,9 @@ class OpenFasta:
 ## HW6
 
 
-def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
+def convert_multiline_fasta_to_oneline(
+    input_fasta: str, output_fasta: Optional[str] = None
+) -> None:
     """
     Creates FASTA file with oneline sequences based on given FASTA file with multiline sequences and stores it
     in oneline_fasta folder in the same directory.
@@ -140,8 +143,12 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta=None):
 
 
 def select_genes_from_gbk_to_fasta(
-    *genes: str, input_gbk: str, n_before: int, n_after: int, output_fasta=None
-):
+    *genes: str,
+    input_gbk: str,
+    n_before: int,
+    n_after: int,
+    output_fasta: Optional[str] = None,
+) -> None:
     """
     Creates FASTA file with neighbor CDSs to given genes from GBK file and stores it
     in fasta_selected_from_gbk folder in the same directory.
@@ -207,7 +214,9 @@ def select_genes_from_gbk_to_fasta(
     get_fasta(output_location, cds_of_interest, cds_translation_dict)
 
 
-def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
+def change_fasta_start_pos(
+    input_fasta: str, shift: int, output_fasta: Optional[str] = None
+) -> None:
     """
     Change the starting position of a DNA sequence in a FASTA file and stores it
     in shifted_fasta folder in the same directory.
@@ -234,7 +243,9 @@ def change_fasta_start_pos(input_fasta: str, shift: int, output_fasta=None):
     print("Starting position changed!")
 
 
-def parse_blast_output(input_file: str, output_file=None, extension=".txt"):
+def parse_blast_output(
+    input_file: str, output_file: Optional[str] = None, extension: str = ".txt"
+) -> None:
     """
     Writes descriptions of best blast results from blast results file to a new file and stores it
     in best_blast_results folder in the same directory.
