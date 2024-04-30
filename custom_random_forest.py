@@ -8,7 +8,11 @@ class RandomForestClassifierCustom(BaseEstimator):
     """Random Forest classifier with custom implementation."""
 
     def __init__(
-        self, n_estimators: int = 10, max_depth: int = None, max_features: int = None, random_state: int = None
+        self,
+        n_estimators: int = 10,
+        max_depth: int = None,
+        max_features: int = None,
+        random_state: int = None,
     ) -> None:
         """
         Initialize the RandomForestClassifierCustom instance.
@@ -26,7 +30,15 @@ class RandomForestClassifierCustom(BaseEstimator):
         self.trees = []
         self.feat_ids_by_tree = []
 
-    def _fit_tree(self, i: int, random_state: int, max_features: int, max_depth: int, X: np.ndarray, y: np.ndarray) -> tuple:
+    def _fit_tree(
+        self,
+        i: int,
+        random_state: int,
+        max_features: int,
+        max_depth: int,
+        X: np.ndarray,
+        y: np.ndarray,
+    ) -> tuple:
         """Fit a single decision tree."""
         np.random.seed(random_state + i)
         feat_idx = np.random.choice(X.shape[1], max_features, replace=False)
@@ -42,7 +54,9 @@ class RandomForestClassifierCustom(BaseEstimator):
 
         return tree, feat_idx
 
-    def fit(self, X: np.ndarray, y: np.ndarray, n_jobs: int = 1) -> "RandomForestClassifierCustom":
+    def fit(
+        self, X: np.ndarray, y: np.ndarray, n_jobs: int = 1
+    ) -> "RandomForestClassifierCustom":
         """
         Fit the RandomForestClassifierCustom model.
 
