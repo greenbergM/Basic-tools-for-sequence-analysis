@@ -1,13 +1,13 @@
 import os
 
 
-def make_location(input_path: str, output_name: str, folder_name: str, commentary: str, file_type: str) -> str:
+def make_location(input_path: str, output_name: str, folder_name: str, prefix: str, file_type: str) -> str:
     """
     Generates location for output file and its name.
     :param input_path: path for input file (str).
     :param output_name: name for output file (str).
     :param folder_name: name for folder where output file will be saved (str)
-    :param commentary: prefix for output file name (str)
+    :param prefix: prefix for output file name (str)
     :param file_type: output file extension (str)
     :return: path to output file (str)
     """
@@ -15,7 +15,7 @@ def make_location(input_path: str, output_name: str, folder_name: str, commentar
     os.makedirs(location, exist_ok=True)
 
     if output_name is None:
-        output_name = f'{commentary}{os.path.basename(input_path)}'
+        output_name = f'{prefix}{os.path.basename(input_path)}'
 
     if not output_name.endswith(file_type):
         output_name = os.path.splitext(output_name)[0]
