@@ -492,7 +492,7 @@ def telegram_logger(chat_id):
                     f"\nProcess execution time: {end - start}"
                 )
 
-                _send_telegram_message(bot_token, func_name, chat_id, message, buffer)
+                _send_message_log(bot_token, func_name, chat_id, message, buffer)
 
                 return result
 
@@ -504,7 +504,7 @@ def telegram_logger(chat_id):
                     f"\nProcess execution time: {end - start}"
                 )
 
-                _send_telegram_message(bot_token, func_name, chat_id, message, buffer)
+                _send_message_log(bot_token, func_name, chat_id, message, buffer)
 
                 raise
 
@@ -513,7 +513,7 @@ def telegram_logger(chat_id):
     return decorator
 
 
-def _send_telegram_message(bot_token, func_name, chat_id, message, buffer):
+def _send_message_log(bot_token, func_name, chat_id, message, buffer):
     """Send a message to a Telegram chat."""
 
     requests.post(
