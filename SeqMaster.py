@@ -456,17 +456,17 @@ def run_genscan(
     response_status = response.status_code
     if response_status != 200:
         return GenscanOutput(response_status, "Error", "Error", "Error")
+
+    soup = BeautifulSoup(response.content, "lxml")
+    analysis_results = soup.find("pre").text
+
+    exon_data = _get_exon_data(analysis_results)
+    if isinstance(exon_data, pd.DataFrame) and len(exon_data) > 1:
+        intron_data = _get_intron_data(exon_data)
     else:
-        soup = BeautifulSoup(response.content, "lxml")
-        analysis_results = soup.find("pre").text
+        intron_data = "No introns found!"
 
-        exon_data = _get_exon_data(analysis_results)
-        if isinstance(exon_data, pd.DataFrame) and len(exon_data) > 1:
-            intron_data = _get_intron_data(exon_data)
-        else:
-            intron_data = "No introns found!"
-
-        cds_list = _get_cds_list(analysis_results)
+    cds_list = _get_cds_list(analysis_results)
 
     return GenscanOutput(response_status, exon_data, intron_data, cds_list)
 
