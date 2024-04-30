@@ -13,6 +13,9 @@ from bs4 import BeautifulSoup
 import re
 
 
+### HW14
+
+
 class IncorrectNucleotideError(ValueError):
     """Exception raised for invalid nucleotide in sequence."""
 
@@ -289,6 +292,9 @@ def filter_fastq(
             )
             if gc_test and len_test and quality_test:
                 SeqIO.write(record, f, "fastq")
+
+
+### HW17
 
 
 @dataclass
